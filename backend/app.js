@@ -6,6 +6,7 @@ import { connection } from "./config/db.js";
 import { errorMiddleware } from "./middlewares/error.js";
 import userRouter from "./routes/user.router.js";
 import { removeUnverifiedAccounts } from "./automation/removeUnverifiedAccounts.js";
+import taskRouter from "./routes/task.router.js";
 
 export const app = express();
 config({path:".env"});
@@ -23,6 +24,8 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.use("/api/user", userRouter);
+
+app.use("/api/task", taskRouter);
 
 removeUnverifiedAccounts();
 connection();
