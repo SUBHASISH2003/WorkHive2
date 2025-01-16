@@ -2,10 +2,13 @@ import React, { useContext, useState } from "react";
 import "./CSS/SignUp.css";
 import { Link, useNavigate } from "react-router-dom";
 import { LoginContext } from "../Context/LoginContextProvider";
+import axios from "axios";
 
 export const SignUp = () => {
   const LoginPropData = useContext(LoginContext);
   const navigate = useNavigate(); // For navigation after form submission
+
+
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -18,6 +21,8 @@ export const SignUp = () => {
   // Handle form submission
   const handleFormData = (e) => {
     e.preventDefault();
+
+    
     if (password !== confirmPass) {
       setError(true);
       setConfirmPass("");
