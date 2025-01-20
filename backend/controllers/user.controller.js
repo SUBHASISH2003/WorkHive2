@@ -9,7 +9,7 @@ import { generateManagerKey } from "../utils/generateManagerKey.js";
 
 export const register = catchAsyncError(async (req, res, next) => {
   try {
-    const {name, email, password, confirmPassword, role, managerKey, DateOfBirth, bio, profilePic } = req.body;
+    const {name, email, password, confirmPassword, role, managerKey, DateOfBirth, bio, profilePic, organizationName} = req.body;
     if (!name || !email || !password || !confirmPassword || !role || !DateOfBirth ) {
       return next(new ErrorHandler("All fields are required.", 400));
     }
@@ -325,4 +325,35 @@ export const resetPassword = catchAsyncError(async (req, res, next) => {
   await user.save();
 
   sendToken(user, 200, "Reset Password Successfully.", res);
+});
+
+
+export const updateProfile = catchAsyncError(async (req, res, next) => {
+  const { bio, profilePic } = req.body;
+
+  // Ensure the user is logged in
+  const userId = req.user._id;
+
+  // Find the user by ID
+  const user = await User.findById(userId);
+
+  if (!user) {
+    return next(new ErrorHandler("User not found.", 404));
+  }
+
+  // Update the fields if provided
+  if (bio) user.bio = bio;
+  if (profilePic) user.profilePic = profilePic;
+
+  // Save the updated user
+  await user.save({ validateModifiedOnly: true });
+
+  res.status(200).json({
+    success: true,
+    message: "Profile updated successfully.",
+    user: {
+      bio: user.bio,
+      profilePic: user.profilePic,
+    },
+  });
 });
