@@ -21,26 +21,43 @@ const userSchema = new mongoose.Schema({
     maxLength: [32, "Password cannot have more than 32 characters."],
     select: false,
   },
-  role: {
-    type: String,
-    enum: ['Manager', 'Employee'],
+  age: {
+    type: Number,
     required: true,
   },
-  accountVerified: { 
-  type: Boolean, 
-  default: false 
-},
-managerKey: {
-  type: String,
-  unique: true,
-  sparse: true,
-},
-linkedManagerKey: {
-  type: String,
-  required: function () {
-    return this.role === "Employee";
+  bio: {
+    type: String,
   },
-},
+  profilPic: {
+    type: String,
+    default: "",
+  },
+  role: {
+    type: String,
+    enum: ["Manager", "Employee"],
+    required: true,
+  },
+  organizationName: {
+    type: String,
+    required: function () {
+      return this.role === "Manager";
+    },
+  },
+  accountVerified: {
+    type: Boolean,
+    default: false,
+  },
+  managerKey: {
+    type: String,
+    unique: true,
+    sparse: true,
+  },
+  linkedManagerKey: {
+    type: String,
+    required: function () {
+      return this.role === "Employee";
+    },
+  },
   verificationCode: Number,
   verificationCodeExpire: Date,
   resetPasswordToken: String,
@@ -51,7 +68,17 @@ linkedManagerKey: {
   },
 });
 
-
+// Virtual for DateOfBirth
+userSchema.virtual("DateOfBirth").set(function (dob) {
+  const birthDate = new Date(dob);
+  const age = new Date().getFullYear() - birthDate.getFullYear();
+  const m = new Date().getMonth() - birthDate.getMonth();
+  if (m < 0 || (m === 0 && new Date().getDate() < birthDate.getDate())) {
+    this.age = age - 1;
+  } else {
+    this.age = age;
+  }
+});
 
 userSchema.pre("save", async function (next) {
   if (this.isModified("password")) {
@@ -60,6 +87,28 @@ userSchema.pre("save", async function (next) {
 
   if (this.role === "Manager" && !this.managerKey) {
     this.managerKey = await generateManagerKey();
+  }
+
+  // Ensure organizationName is required for managers
+  if (this.role === "Manager" && !this.organizationName) {
+    const error = new Error("Organization name is required for managers.");
+    return next(error);
+  }
+
+  // Assign organizationName for employees based on their linked manager's key
+  if (this.role === "Employee" && this.isModified("linkedManagerKey")) {
+    const manager = await this.constructor.findOne({ managerKey: this.linkedManagerKey });
+    if (manager && manager.role === "Manager") {
+      this.organizationName = manager.organizationName;
+    } else {
+      const error = new Error("Invalid manager key or manager not found.");
+      return next(error);
+    }
+  }
+
+  if (!this.age) {
+    const error = new Error("Date of birth is required to calculate age.");
+    return next(error);
   }
 
   next();

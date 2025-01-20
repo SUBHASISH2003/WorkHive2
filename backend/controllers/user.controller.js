@@ -9,8 +9,8 @@ import { generateManagerKey } from "../utils/generateManagerKey.js";
 
 export const register = catchAsyncError(async (req, res, next) => {
   try {
-    const {name, email, password, confirmPassword, role, managerKey,} = req.body;
-    if (!name || !email || !password || !confirmPassword || !role) {
+    const {name, email, password, confirmPassword, role, managerKey, DateOfBirth, bio, profilePic } = req.body;
+    if (!name || !email || !password || !confirmPassword || !role || !DateOfBirth ) {
       return next(new ErrorHandler("All fields are required.", 400));
     }
 
@@ -48,6 +48,15 @@ export const register = catchAsyncError(async (req, res, next) => {
    // Role-specific logic
    let user;
    if (role === "Manager") {
+
+    if (!organizationName) {
+      return next(
+        new ErrorHandler("Organization name is required for Managers.", 400)
+      );
+    }
+
+
+
     // Generate a unique manager key
     const newManagerKey = await generateManagerKey();
 
@@ -57,6 +66,10 @@ export const register = catchAsyncError(async (req, res, next) => {
       password,
       role,
       managerKey: newManagerKey,
+      DateOfBirth,
+      bio,
+      profilePic,
+      organizationName,
     });
 
     // sendToken(user, 201, "Manager registered successfully.", res);
@@ -74,6 +87,10 @@ export const register = catchAsyncError(async (req, res, next) => {
       password,
       role,
       linkedManagerKey: managerKey,
+      DateOfBirth,
+      bio,
+      profilePic,
+      organizationName: manager.organizationName,
     });
 
     // sendToken(user, 201, "Employee registered successfully.", res);
