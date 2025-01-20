@@ -42,57 +42,102 @@ export const createTask = async (req, res) => {
 // Get tasks (Employees see assigned tasks, Managers see all tasks)
 export const getTasks = async (req, res) => {
   try {
+    const { role, email } = req.user; // Extract the user's role and email from the request
+
     let tasks;
 
-    if (req.user.role === 'Manager') {
-      // Managers see all tasks
-      tasks = await Task.find()
-        .populate('assignedEmployees', 'name email')
-        .populate('createdBy', 'name email');
+    if (role === 'Manager') {
+      // Admins: Fetch all tasks with selected fields
+      tasks = await Task.find({ createdBy: email })
+      .populate('assignedEmployees', 'name email')  // Populate assigned employees with name and email
+      .populate('createdBy', 'name email');  // Populate manager with name and email
     } else {
-      // Employees see only their assigned tasks
-      tasks = await Task.find({ assignedEmployees: req.user._id })
-        .populate('createdBy', 'name email');
+      // Employees: Fetch tasks assigned to them and filter their specific response
+      tasks = await Task.find(
+        { assignedEmployees: email },
+        'title description deadline createdBy status employeeResponses' // Select desired fields
+      ).lean();
+
+      // Filter `employeeResponses` to include only the current employee's response
+      tasks = tasks.map(task => {
+        task.employeeResponses = task.employeeResponses.filter(
+          response => response.employee === email
+        );
+        return task;
+      });
     }
 
-    res.json(tasks);
+    // Populate `createdBy` with the manager's name and email
+    tasks = await Promise.all(
+      tasks.map(async task => {
+        const creator = await User.findOne({ email: task.createdBy }, 'name email');
+        task.createdBy = creator ? { name: creator.name, email: creator.email } : null;
+        return task;
+      })
+    );
+
+    res.status(200).json(tasks);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 };
 
-// Update task status or employee response
+
 export const updateTask = async (req, res) => {
   try {
-    const { taskId } = req.params;
-    const { status, response } = req.body;
+    const { taskId } = req.params; // Extract taskId from URL
+    const { response } = req.body; // Extract response from request body
+    const { role, email } = req.user; // Extract user details from authenticated user
 
+    // Fetch the task by ID
     const task = await Task.findById(taskId);
     if (!task) {
       return res.status(404).json({ message: 'Task not found' });
     }
 
-    // Allow managers to update the status or employees to add their responses
-    if (req.user.role === 'admin') {
-      task.status = status;
-    } else {
-      const employeeIndex = task.employeeResponses.findIndex(
-        (resp) => resp.employee.toString() === req.user._id.toString()
+    // Role-based logic for updating the task
+    if (role === 'Employee') {
+      // Employees can update their response
+      if (!response || !['approved', 'rejected'].includes(response)) {
+        return res.status(400).json({ message: 'Invalid response value' });
+      }
+
+      const existingResponseIndex = task.employeeResponses.findIndex(
+        (resp) => resp.employee === email
       );
 
-      if (employeeIndex === -1) {
+      if (existingResponseIndex === -1) {
+        // Add new response
         task.employeeResponses.push({
-          employee: req.user._id,
+          employee: email,
           response,
         });
       } else {
-        task.employeeResponses[employeeIndex].response = response;
+        // Update existing response
+        task.employeeResponses[existingResponseIndex].response = response;
       }
-    }
 
-    await task.save();
-    res.json(task);
+      await task.save();
+
+      return res.status(200).json({
+        message: 'Response updated successfully',
+        task: {
+          title: task.title,
+          description: task.description,
+          deadline: task.deadline,
+          status: task.status,
+          createdBy: task.createdBy,
+          employeeResponses: task.employeeResponses,
+        },
+      });
+    } else {
+      // Managers are not authorized to update tasks via this endpoint
+      return res.status(403).json({
+        message: 'Managers are not authorized to update tasks via this endpoint',
+      });
+    }
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ message: error.message });
   }
 };
+
