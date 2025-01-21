@@ -4,7 +4,16 @@ import { User } from "../models/user.model.js";
 import { sendEmail } from "../utils/sendEmail.js";
 import { sendToken } from "../utils/sendToken.js";
 import crypto from "crypto";
+import fs from "fs";
 import { generateManagerKey } from "../utils/generateManagerKey.js";
+import cloudinary from "../utils/cloudinary.js";
+
+
+const deleteTempFile = (filePath) => {
+  fs.unlink(filePath, (err) => {
+    if (err) console.error("Failed to delete temp file:", err);
+  });
+};
 
 
 export const register = catchAsyncError(async (req, res, next) => {
@@ -329,7 +338,7 @@ export const resetPassword = catchAsyncError(async (req, res, next) => {
 
 
 export const updateProfile = catchAsyncError(async (req, res, next) => {
-  const { bio, profilePic } = req.body;
+  const { bio } = req.body;
 
   // Ensure the user is logged in
   const userId = req.user._id;
@@ -341,19 +350,47 @@ export const updateProfile = catchAsyncError(async (req, res, next) => {
     return next(new ErrorHandler("User not found.", 404));
   }
 
+  // Handle profile picture upload if provided
+  let profilePicUrl = user.profilePic;
+  if (req.file) {
+    try {
+      // Upload new image to Cloudinary
+      const result = await cloudinary.uploader.upload(req.file.path, {
+        folder: "profile_pics",
+        public_id: `${userId}-profile-pic`,
+        overwrite: true,
+        transformation: { width: 200, height: 200, crop: "fill" },
+      });
+
+      // Assign the uploaded image URL to user.profilePic
+      profilePicUrl = result.secure_url;
+
+      // Delete the temporary file
+      fs.unlink(req.file.path, (err) => {
+        if (err) console.error("Failed to delete temp file:", err);
+      });
+    } catch (error) {
+      return next(new ErrorHandler("Failed to upload profile picture.", 500));
+    }
+  }
+
   // Update the fields if provided
   if (bio) user.bio = bio;
-  if (profilePic) user.profilePic = profilePic;
+  user.profilePic = profilePicUrl;
 
   // Save the updated user
-  await user.save({ validateModifiedOnly: true });
+  try {
+    await user.save({ validateModifiedOnly: true });
 
-  res.status(200).json({
-    success: true,
-    message: "Profile updated successfully.",
-    user: {
-      bio: user.bio,
-      profilePic: user.profilePic,
-    },
-  });
+    res.status(200).json({
+      success: true,
+      message: "Profile updated successfully.",
+      user: {
+        bio: user.bio,
+        profilePic: user.profilePic,
+      },
+    });
+  } catch (error) {
+    return next(new ErrorHandler("Failed to save user profile.", 500));
+  }
 });

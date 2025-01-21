@@ -1,4 +1,5 @@
 import express from "express";
+import upload from "../middlewares/multer.js";
 import {
   register,
   verifyOTP,
@@ -21,6 +22,6 @@ router.get("/logout", isAuthenticated, logout);
 router.get("/me", isAuthenticated, getUser);
 router.post("/password/forgot", forgotPassword);
 router.put("/password/reset/:token", resetPassword);
-router.put("/update-profile", isAuthenticated, updateProfile);
+router.put("/update-profile", isAuthenticated, upload.single("profilePic"), updateProfile);
 
 export default router;
