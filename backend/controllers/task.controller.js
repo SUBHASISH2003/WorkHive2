@@ -57,14 +57,6 @@ export const getTasks = async (req, res) => {
         { assignedEmployees: email },
         'title description deadline createdBy status employeeResponses' // Select desired fields
       ).lean();
-
-      // Filter `employeeResponses` to include only the current employee's response
-      tasks = tasks.map(task => {
-        task.employeeResponses = task.employeeResponses.filter(
-          response => response.employee === email
-        );
-        return task;
-      });
     }
 
     // Populate `createdBy` with the manager's name and email
