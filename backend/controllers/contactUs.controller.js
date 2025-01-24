@@ -20,7 +20,7 @@ export const submitContact = async (req, res) => {
    // Use the sendEmail utility
    await contactUsEmail({
      email, // Admin email from environment variables
-     subject: `New Contact Us Message`,
+     subject: `Message From Dutio`,
      message: emailMessage,
    });
 

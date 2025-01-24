@@ -13,7 +13,7 @@ export const contactUsEmail = async ({ email, subject, message }) => {
 
   const options = {
     from: email,
-    to: process.env.SMTP_MAIL,
+    to: process.env.ADMIN_EMAIL,
     subject,
     html: message,
   };
