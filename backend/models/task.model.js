@@ -25,21 +25,16 @@ const taskSchema = new mongoose.Schema({
   // Assigned employees - array of references to User model
   assignedEmployees: [
     {
-      type: String,
+      type: mongoose.Schema.Types.ObjectId,
+      ref: User,
       required: true,
     },
   ],
   
-  // Task status - enum with specific allowed values
-  status: {
-    type: String,
-    enum: ['pending', 'failed', 'completed'],
-    default: 'pending',
-  },
-  
   // Manager who created the task - reference to User model
   createdBy: {
-    type: String,
+    type: mongoose.Schema.Types.ObjectId,
+    ref: User,
     required: true,
   },
   
@@ -47,12 +42,19 @@ const taskSchema = new mongoose.Schema({
   employeeResponses: [
     {
       employee: {
-        type: String,
+        type: mongoose.Schema.Types.ObjectId,
+        ref: User,
         required: true,
       },
       response: {
         type: String,
-        enum: ['approved', 'rejected'],
+        
+        enum: ['accept', 'reject'],
+      },
+      status: {
+        type: String,
+        enum: ['pending', 'failed', 'completed'],
+        default: 'pending',
       },
     },
   ],
@@ -61,10 +63,13 @@ const taskSchema = new mongoose.Schema({
   timestamps: true,
 });
 
-// Middleware to auto-update status to 'failed' if deadline is passed
-taskSchema.pre('save', function(next) {
-  if (this.deadline < new Date() && this.status === 'pending') {
-    this.status = 'failed';
+taskSchema.pre('save', function (next) {
+  if (this.deadline && this.deadline < new Date()) {
+    this.employeeResponses.forEach((response) => {
+      if (response.status === 'pending') {
+        response.status = 'failed';
+      }
+    });
   }
   next();
 });

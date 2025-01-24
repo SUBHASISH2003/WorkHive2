@@ -1,3 +1,4 @@
+import mongoose from 'mongoose';
 import { Task } from '../models/task.model.js';
 import { User } from '../models/user.model.js';
 
@@ -11,25 +12,33 @@ export const createTask = async (req, res) => {
 
     // Check if the user is a manager
     if (req.user.role !== 'Manager') {
-      return res.status(403).json({ message: 'Access denied. Only admins can create tasks.' });
+      return res.status(403).json({ message: 'Access denied. Only managers can create tasks.' });
     }
 
-     // Find user objects based on email addresses
-     const assignedEmployeeEmails = [];
+    // Fetch the manager's key
+    const managerKey = req.user.managerKey;
+
+    const deadlineDate = new Date(deadline);
+    if (isNaN(deadlineDate.getTime()) || deadlineDate < new Date()) {
+      return res.status(400).json({ message: 'Invalid or past deadline.' });
+    }
+
+    // Check if all assigned employees exist
+     const assignedEmployeeIds = [];
      for (const email of assignedEmployees) {
-       const employee = await User.findOne({ email });
+       const employee = await User.findOne({ email, role: 'Employee', linkedManagerKey: managerKey });
        if (!employee) {
-         return res.status(404).json({ message: `Employee with email ${email} not found.` });
+         return res.status(404).json({ message: `Employee with email ${email} not found or not linked to you.` });
        }
-       assignedEmployeeEmails.push(email); // Push the ObjectID of the found employee
+       assignedEmployeeIds.push(employee._id); // Push the ObjectID of the found employee
      }
 
     const task = new Task({
       title,
       description,
-      deadline,
-      assignedEmployees: assignedEmployeeEmails,  // Store emails instead of ObjectIDs
-      createdBy: req.user.email,  // Store manager's email
+      deadline: deadlineDate,
+      assignedEmployees: assignedEmployeeIds,
+      createdBy: req.user._id,
     });
 
     await task.save();
@@ -42,31 +51,35 @@ export const createTask = async (req, res) => {
 // Get tasks (Employees see assigned tasks, Managers see all tasks)
 export const getTasks = async (req, res) => {
   try {
-    const { role, email } = req.user; // Extract the user's role and email from the request
+    const { role, _id } = req.user; // Extract the user's role and email from the request
 
     let tasks;
 
     if (role === 'Manager') {
-      // Admins: Fetch all tasks with selected fields
-      tasks = await Task.find({ createdBy: email })
-      .populate('assignedEmployees', 'name email')  // Populate assigned employees with name and email
-      .populate('createdBy', 'name email');  // Populate manager with name and email
+      // Manager: Fetch all tasks with selected fields
+      tasks = await Task.find({ createdBy: _id })
+      .populate('assignedEmployees', 'name email') 
+      .populate('createdBy', 'name email')
+      .populate('employeeResponses.employee', 'name email');
     } else {
+      tasks = await Task.find({ assignedEmployees: _id })
       // Employees: Fetch tasks assigned to them and filter their specific response
-      tasks = await Task.find(
-        { assignedEmployees: email },
-        'title description deadline createdBy status employeeResponses' // Select desired fields
-      ).lean();
+      .populate('assignedEmployees', 'name email')
+      .populate('createdBy', 'name email')
+      .populate('employeeResponses.employee', 'name email');
     }
 
-    // Populate `createdBy` with the manager's name and email
-    tasks = await Promise.all(
-      tasks.map(async task => {
-        const creator = await User.findOne({ email: task.createdBy }, 'name email');
-        task.createdBy = creator ? { name: creator.name, email: creator.email } : null;
-        return task;
-      })
-    );
+      // Update the status of expired employee responses dynamically
+      tasks.forEach((task) => {
+        if (task.deadline < new Date()) {
+          task.employeeResponses.forEach((response) => {
+            if (response.status === 'pending') {
+              response.status = 'failed';
+            }
+          });
+        }
+      });
+  
 
     res.status(200).json(tasks);
   } catch (error) {
@@ -78,58 +91,119 @@ export const getTasks = async (req, res) => {
 export const updateTask = async (req, res) => {
   try {
     const { taskId } = req.params; // Extract taskId from URL
-    const { response } = req.body; // Extract response from request body
-    const { role, email } = req.user; // Extract user details from authenticated user
+    const { response, status } = req.body; // Extract response from request body
+    const { role, _id } = req.user; // Extract user details from authenticated user
 
     // Fetch the task by ID
+
+    if (!mongoose.Types.ObjectId.isValid(taskId)) {
+      return res.status(400).json({ message: 'Invalid task ID' });
+    }
+
     const task = await Task.findById(taskId);
     if (!task) {
       return res.status(404).json({ message: 'Task not found' });
     }
 
-    // Role-based logic for updating the task
-    if (role === 'Employee') {
-      // Employees can update their response
-      if (!response || !['approved', 'rejected'].includes(response)) {
-        return res.status(400).json({ message: 'Invalid response value' });
+  // Ensure only employees can update their responses
+  if (role !== 'Employee') {
+    return res.status(403).json({ message: 'Only employees can update task responses.' });
+  }
+
+  // Ensure the task deadline has not passed
+  if (task.deadline < new Date()) {
+    return res.status(400).json({ message: 'Cannot update responses for a task with a past deadline.' });
+  }
+
+  // Update or add employee response
+  const existingResponseIndex = task.employeeResponses.findIndex(
+    (resp) => resp.employee.toString() === _id.toString()
+  );
+
+  if (existingResponseIndex === -1) {
+    if (!response || !['accept', 'reject'].includes(response)) {
+      return res.status(400).json({ message: 'Invalid response value.' });
+    }
+    task.employeeResponses.push({
+      employee: _id,
+      response,
+      status: response === 'reject' ? 'failed' : 'pending',
+    });
+  } else {
+      // Update the existing response
+      const employeeResponse = task.employeeResponses[existingResponseIndex];
+      employeeResponse.response = response;
+
+      // Automatically set status to 'failed' if response is 'reject'
+      if (response === 'reject') {
+        employeeResponse.status = 'failed';
       }
+  }
 
-      const existingResponseIndex = task.employeeResponses.findIndex(
-        (resp) => resp.employee === email
-      );
+  await task.save();
 
-      if (existingResponseIndex === -1) {
-        // Add new response
-        task.employeeResponses.push({
-          employee: email,
-          response,
-        });
-      } else {
-        // Update existing response
-        task.employeeResponses[existingResponseIndex].response = response;
-      }
+  res.status(200).json({ message: 'Response updated successfully', task });
+} catch (error) {
+  res.status(500).json({ message: error.message });
+}
+};
 
-      await task.save();
 
-      return res.status(200).json({
-        message: 'Response updated successfully',
-        task: {
-          title: task.title,
-          description: task.description,
-          deadline: task.deadline,
-          status: task.status,
-          createdBy: task.createdBy,
-          employeeResponses: task.employeeResponses,
-        },
-      });
-    } else {
-      // Managers are not authorized to update tasks via this endpoint
-      return res.status(403).json({
-        message: 'Managers are not authorized to update tasks via this endpoint',
+
+export const markTaskAsComplete = async (req, res) => {
+  try {
+    const { taskId } = req.params; // Extract the task ID from the URL
+    const { _id, role } = req.user; // Get the authenticated user details
+
+    // Ensure only employees can mark tasks as complete
+    if (role !== 'Employee') {
+      return res.status(403).json({ message: 'Only employees can mark tasks as complete.' });
+    }
+
+    // Validate task ID
+    if (!mongoose.Types.ObjectId.isValid(taskId)) {
+      return res.status(400).json({ message: 'Invalid task ID.' });
+    }
+
+    // Fetch the task
+    const task = await Task.findById(taskId);
+    if (!task) {
+      return res.status(404).json({ message: 'Task not found.' });
+    }
+
+    // Find the employee's response
+    const employeeResponse = task.employeeResponses.find(
+      (response) => response.employee.toString() === _id.toString()
+    );
+
+    // Check if the employee has responded to the task
+    if (!employeeResponse) {
+      return res.status(404).json({ message: 'No response found for this employee on the task.' });
+    }
+
+    // Ensure the employee's response was "accept"
+    if (employeeResponse.response !== 'accept') {
+      return res.status(400).json({
+        message: 'You can only mark tasks as complete if your response was "accept".',
       });
     }
+
+    // Check if the status is already "complete"
+    if (employeeResponse.status === 'completed') {
+      return res.status(400).json({ message: 'This task is already marked as complete.' });
+    }
+
+    // Update the status to "complete"
+    employeeResponse.status = 'completed';
+
+    // Save the updated task
+    await task.save();
+
+    res.status(200).json({
+      message: 'Task marked as complete successfully.',
+      task,
+    });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
-
