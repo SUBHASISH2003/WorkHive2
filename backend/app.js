@@ -7,6 +7,7 @@ import { errorMiddleware } from "./middlewares/error.js";
 import userRouter from "./routes/user.router.js";
 import { removeUnverifiedAccounts } from "./automation/removeUnverifiedAccounts.js";
 import taskRouter from "./routes/task.router.js";
+import contactRoutes from "./routes/contactUs.router.js";
 
 export const app = express();
 config({path:".env"});
@@ -26,6 +27,8 @@ app.use(express.urlencoded({ extended: true }));
 app.use("/api/user", userRouter);
 
 app.use("/api/task", taskRouter);
+
+app.use("/api/contact", contactRoutes);
 
 removeUnverifiedAccounts();
 connection();
