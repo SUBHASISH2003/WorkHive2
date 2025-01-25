@@ -1,6 +1,6 @@
 import { contactUsEmail } from "../utils/contactUsEmail.js";
 import { Contact } from "../models/contactUS.model.js";
-// Submit a contact inquiry and send an email
+
 export const submitContact = async (req, res) => {
   try {
     const { name, email, message } = req.body;

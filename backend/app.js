@@ -8,6 +8,7 @@ import userRouter from "./routes/user.router.js";
 import { removeUnverifiedAccounts } from "./automation/removeUnverifiedAccounts.js";
 import taskRouter from "./routes/task.router.js";
 import contactRoutes from "./routes/contactUs.router.js";
+import { leaveRoutes } from "./routes/leaveRequest.router.js";
 
 export const app = express();
 config({path:".env"});
@@ -29,6 +30,8 @@ app.use("/api/user", userRouter);
 app.use("/api/task", taskRouter);
 
 app.use("/api/contact", contactRoutes);
+
+app.use("/api/leave", leaveRoutes);
 
 removeUnverifiedAccounts();
 connection();
