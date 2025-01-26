@@ -122,9 +122,6 @@ export const register = catchAsyncError(async (req, res, next) => {
   }
 });
 
-
-
-
 async function sendVerificationCode(
   verificationCode,
   name,
@@ -267,34 +264,37 @@ export const getUser = catchAsyncError(async (req, res, next) => {
 });
 
 export const forgotPassword = catchAsyncError(async (req, res, next) => {
-  const user = await User.findOne({
-    email: req.body.email,
-    accountVerified: true,
-  });
+  const { email } = req.body;
+
+  if (!email) {
+    return next(new ErrorHandler("Email is required.", 400));
+  }
+
+  const user = await User.findOne({ email, accountVerified: true });
   if (!user) {
     return next(new ErrorHandler("User not found.", 404));
   }
-  const resetToken = user.generateResetPasswordToken();
+
+  // Generate OTP for password reset
+  const resetPasswordOtp = Math.floor(100000 + Math.random() * 900000); // Generate 6-digit OTP
+  user.resetPasswordOtp = resetPasswordOtp;
+  user.resetPasswordOtpExpire = Date.now() + 10 * 60 * 1000; // OTP valid for 10 minutes
   await user.save({ validateBeforeSave: false });
-  const resetPasswordUrl = `${process.env.FRONTEND_URL}/password/reset/${resetToken}`;
 
-  // const message = `Your Reset Password Token is:- \n\n ${resetPasswordUrl} \n\n If you have not requested this email then please ignore it.`;
-
-    // Inline email template
-    const message = `
+  const message = `
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #ddd; border-radius: 8px; background-color: #f9f9f9;">
-      <h2 style="color: #71C9CE; text-align: center;">Reset Password Request</h2>
+      <h2 style="color: #71C9CE; text-align: center;">Reset Password OTP</h2>
       <p style="font-size: 16px; color: #333;">Dear ${user.name || "User"},</p>
       <p style="font-size: 16px; color: #333;">We received a request to reset your password.</p>
-      <p style="font-size: 16px; color: #333;">To reset your password, please click the button below:</p>
+      <p style="font-size: 16px; color: #333;">Your OTP for password reset is:</p>
       <div style="text-align: center; margin: 20px 0;">
-        <a href="${resetPasswordUrl}" style="display: inline-block; color: #ffffff; background-color: #71C9CE; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-size: 16px;">
-          Reset Password
-        </a>
+        <span style="display: inline-block; font-size: 24px; font-weight: bold; color: #71C9CE; padding: 10px 20px; border: 1px solid #4CAF50; border-radius: 5px; background-color: #e8f5e9;">
+          ${resetPasswordOtp}
+        </span>
       </div>
-      <p style="font-size: 16px; color: #333;">If you did not request this, you can safely ignore this email.</p>
+      <p style="font-size: 16px; color: #333;">The OTP will expire in 10 minutes. Please use it to reset your password.</p>
       <footer style="margin-top: 20px; text-align: center; font-size: 14px; color: #999;">
-        <p>Thank you,<br>DUTIO Team </p>
+        <p>Thank you,<br>DUTIO Team</p>
         <p style="font-size: 12px; color: #aaa;">This is an automated message. Please do not reply to this email.</p>
       </footer>
     </div>
@@ -303,58 +303,75 @@ export const forgotPassword = catchAsyncError(async (req, res, next) => {
   try {
     await sendEmail({
       email: user.email,
-      subject: "DUTIO APP RESET PASSWORD",
+      subject: "DUTIO Reset Password OTP",
       message,
     });
+
     res.status(200).json({
       success: true,
-      message: `Email sent to ${user.email} successfully.`,
+      message: `OTP sent to ${user.email} successfully.`,
     });
   } catch (error) {
-    user.resetPasswordToken = undefined;
-    user.resetPasswordExpire = undefined;
+    user.resetPasswordOtp = undefined;
+    user.resetPasswordOtpExpire = undefined;
     await user.save({ validateBeforeSave: false });
-    return next(
-      new ErrorHandler(
-        error.message ? error.message : "Cannot send reset password token.",
-        500
-      )
-    );
+
+    return next(new ErrorHandler("Failed to send OTP. Please try again.", 500));
   }
 });
 
-export const resetPassword = catchAsyncError(async (req, res, next) => {
-  const { token } = req.params;
-  const resetPasswordToken = crypto
-    .createHash("sha256")
-    .update(token)
-    .digest("hex");
+export const validateOtp = catchAsyncError(async (req, res, next) => {
+  const { email, otp } = req.body;
+
+  if (!email || !otp) {
+    return next(new ErrorHandler("Email and OTP are required.", 400));
+  }
+
   const user = await User.findOne({
-    resetPasswordToken,
-    resetPasswordExpire: { $gt: Date.now() },
+    email,
+    resetPasswordOtp: otp,
+    resetPasswordOtpExpire: { $gt: Date.now() }, // Check if OTP is not expired
   });
+
   if (!user) {
-    return next(
-      new ErrorHandler(
-        "Reset password token is invalid or has been expired.",
-        400
-      )
-    );
+    return next(new ErrorHandler("Invalid OTP or OTP has expired.", 400));
   }
 
-  if (req.body.password !== req.body.confirmPassword) {
-    return next(
-      new ErrorHandler("Password & confirm password do not match.", 400)
-    );
+  res.status(200).json({
+    success: true,
+    message: "OTP is valid.",
+  });
+});
+
+export const setNewPassword = catchAsyncError(async (req, res, next) => {
+  const { email, password, confirmPassword } = req.body;
+
+  if (!email || !password || !confirmPassword) {
+    return next(new ErrorHandler("All fields are required.", 400));
   }
 
-  user.password = req.body.password;
-  user.resetPasswordToken = undefined;
-  user.resetPasswordExpire = undefined;
+  if (password !== confirmPassword) {
+    return next(new ErrorHandler("Password and confirm password do not match.", 400));
+  }
+
+  const user = await User.findOne({ email });
+
+  if (!user) {
+    return next(new ErrorHandler("User not found.", 404));
+  }
+
+  user.password = password; // Save the new password
+  user.resetPasswordOtp = undefined; // Clear the OTP
+  user.resetPasswordOtpExpire = undefined; // Clear OTP expiration
   await user.save();
 
-  sendToken(user, 200, "Reset Password Successfully.", res);
+  res.status(200).json({
+    success: true,
+    message: "Password has been updated successfully.",
+  });
 });
+
+
 
 
 export const updateProfile = catchAsyncError(async (req, res, next) => {

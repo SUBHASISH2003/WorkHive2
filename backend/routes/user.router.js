@@ -7,7 +7,8 @@ import {
   logout,
   getUser,
   forgotPassword,
-  resetPassword,
+  validateOtp,
+  setNewPassword,
   updateProfile,
 
 } from "../controllers/user.controller.js";
@@ -21,7 +22,8 @@ router.post("/login", login);
 router.get("/logout", isAuthenticated, logout);
 router.get("/me", isAuthenticated, getUser);
 router.post("/password/forgot", forgotPassword);
-router.put("/password/reset/:token", resetPassword);
+router.post("/password/validate-otp", validateOtp);
+router.put("/password/set-new", setNewPassword);
 router.put("/update-profile", isAuthenticated, upload.single("profilePic"), updateProfile);
 
 export default router;
