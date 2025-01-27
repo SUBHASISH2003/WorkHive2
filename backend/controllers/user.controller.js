@@ -376,6 +376,28 @@ export const getRoomDetails = async (req, res) => {
   try {
     const { managerKey } = req.params;
 
+    // Ensure the user is authenticated and their data is in req.user (from middleware)
+    const loggedInUser = req.user;
+
+    if (!loggedInUser) {
+      return res.status(401).json({ message: "Unauthorized access. Please log in." });
+    }
+
+    // Check if the logged-in user is a manager or an employee
+    if (
+      loggedInUser.role === "Manager" &&
+      loggedInUser.managerKey !== managerKey
+    ) {
+      return res.status(403).json({ message: "You are not authorized to view this data." });
+    }
+
+    if (
+      loggedInUser.role === "Employee" &&
+      loggedInUser.linkedManagerKey !== managerKey
+    ) {
+      return res.status(403).json({ message: "You are not authorized to view this data." });
+    }
+
     // Fetch the manager based on managerKey
     const manager = await User.findOne({ managerKey, role: "Manager" });
 
@@ -386,46 +408,60 @@ export const getRoomDetails = async (req, res) => {
     // Fetch all employees linked to this manager
     const employees = await User.find({ linkedManagerKey: managerKey, role: "Employee" });
 
-    // Fetch employee performance for each employee
+    // Fetch employee performance and task stats for each employee
     const employeeData = await Promise.all(
       employees.map(async (employee) => {
         // Find tasks where the employee is assigned
         const tasks = await Task.find({ assignedEmployees: employee._id });
 
-        // Calculate performance based on completed and failed tasks
+        // Initialize task counters
+        let acceptedTasks = 0;
+        let rejectedTasks = 0;
         let completedTasks = 0;
         let failedTasks = 0;
+        let pendingTasks = 0;
 
+        // Process each task
         tasks.forEach((task) => {
           const response = task.employeeResponses.find(
             (resp) => resp.employee.toString() === employee._id.toString()
           );
 
           if (response) {
+            // Count tasks based on the `response` and `status`
+            if (response.response === "accept") acceptedTasks++;
+            if (response.response === "reject") rejectedTasks++;
+
             if (response.status === "completed") completedTasks++;
             if (response.status === "failed") failedTasks++;
+            if (response.status === "pending") pendingTasks++;
           }
         });
 
         // Calculate performance percentage
-        const totalTasks = completedTasks + failedTasks;
+        const totalTasks = completedTasks + failedTasks + pendingTasks;
         const performance = totalTasks > 0 ? (completedTasks / totalTasks) * 100 : 0;
 
+        // Return employee data with task stats
         return {
           name: employee.name,
           email: employee.email,
           performance: `${performance.toFixed(2)}%`,
+          totalAcceptedTasks: acceptedTasks,
+          totalRejectedTasks: rejectedTasks,
+          totalCompletedTasks: completedTasks,
+          totalPendingTasks: pendingTasks,
+          totalFailedTasks: failedTasks,
         };
       })
     );
 
-    // Structure the response to include manager info and employees with performance
+    // Structure the response to include manager info and employees with performance and task stats
     const response = {
       managerKey: manager.managerKey,
       manager: {
         name: manager.name,
         email: manager.email,
-        
       },
       employees: employeeData,
     };
@@ -435,6 +471,7 @@ export const getRoomDetails = async (req, res) => {
     return res.status(500).json({ message: error.message });
   }
 };
+
 
 
 
