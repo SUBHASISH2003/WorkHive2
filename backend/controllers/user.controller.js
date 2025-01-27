@@ -1,6 +1,7 @@
 import ErrorHandler from "../middlewares/error.js";
 import { catchAsyncError } from "../middlewares/catchAsyncError.js";
 import { User } from "../models/user.model.js";
+import { Task } from "../models/task.model.js";
 import { sendEmail } from "../utils/sendEmail.js";
 import { sendToken } from "../utils/sendToken.js";
 import crypto from "crypto";
@@ -370,6 +371,70 @@ export const setNewPassword = catchAsyncError(async (req, res, next) => {
     message: "Password has been updated successfully.",
   });
 });
+
+export const getRoomDetails = async (req, res) => {
+  try {
+    const { managerKey } = req.params;
+
+    // Fetch the manager based on managerKey
+    const manager = await User.findOne({ managerKey, role: "Manager" });
+
+    if (!manager) {
+      return res.status(404).json({ message: "Manager not found." });
+    }
+
+    // Fetch all employees linked to this manager
+    const employees = await User.find({ linkedManagerKey: managerKey, role: "Employee" });
+
+    // Fetch employee performance for each employee
+    const employeeData = await Promise.all(
+      employees.map(async (employee) => {
+        // Find tasks where the employee is assigned
+        const tasks = await Task.find({ assignedEmployees: employee._id });
+
+        // Calculate performance based on completed and failed tasks
+        let completedTasks = 0;
+        let failedTasks = 0;
+
+        tasks.forEach((task) => {
+          const response = task.employeeResponses.find(
+            (resp) => resp.employee.toString() === employee._id.toString()
+          );
+
+          if (response) {
+            if (response.status === "completed") completedTasks++;
+            if (response.status === "failed") failedTasks++;
+          }
+        });
+
+        // Calculate performance percentage
+        const totalTasks = completedTasks + failedTasks;
+        const performance = totalTasks > 0 ? (completedTasks / totalTasks) * 100 : 0;
+
+        return {
+          name: employee.name,
+          email: employee.email,
+          performance: `${performance.toFixed(2)}%`,
+        };
+      })
+    );
+
+    // Structure the response to include manager info and employees with performance
+    const response = {
+      managerKey: manager.managerKey,
+      manager: {
+        name: manager.name,
+        email: manager.email,
+        
+      },
+      employees: employeeData,
+    };
+
+    return res.status(200).json({ message: "Manager and employees fetched successfully.", data: response });
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+};
 
 
 

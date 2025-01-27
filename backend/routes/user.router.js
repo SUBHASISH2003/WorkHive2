@@ -9,6 +9,7 @@ import {
   forgotPassword,
   validateOtp,
   setNewPassword,
+  getRoomDetails,
   updateProfile,
 
 } from "../controllers/user.controller.js";
@@ -24,6 +25,7 @@ router.get("/me", isAuthenticated, getUser);
 router.post("/password/forgot", forgotPassword);
 router.post("/password/validate-otp", validateOtp);
 router.put("/password/set-new", setNewPassword);
+router.get("/room/details/:managerKey",isAuthenticated, getRoomDetails);
 router.put("/update-profile", isAuthenticated, upload.single("profilePic"), updateProfile);
 
 export default router;
