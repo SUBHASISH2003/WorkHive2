@@ -80,6 +80,8 @@ export const register = catchAsyncError(async (req, res, next) => {
       bio,
       profilePic,
       organizationName,
+      noOfLinkedEmp: 0,
+      totalNoOfTaskCreated: 0,
     });
 
     // sendToken(user, 201, "Manager registered successfully.", res);
@@ -102,8 +104,7 @@ export const register = catchAsyncError(async (req, res, next) => {
       profilePic,
       organizationName: manager.organizationName,
     });
-
-    // sendToken(user, 201, "Employee registered successfully.", res);
+    
   } else {
     return next(new ErrorHandler("Invalid role. Must be 'Manager' or 'Employee'.", 400));
   }
@@ -175,8 +176,6 @@ export const verifyOTP = catchAsyncError(async (req, res, next) => {
     const userAllEntries = await User.find({
      email,
      accountVerified: false,
-        
-      
     }).sort({ createdAt: -1 });
 
     if (!userAllEntries) {
@@ -190,8 +189,8 @@ export const verifyOTP = catchAsyncError(async (req, res, next) => {
 
       await User.deleteMany({
         _id: { $ne: user._id },
-        
-          email, accountVerified: false 
+        email,
+        accountVerified: false,
         
       });
     } else {
@@ -207,8 +206,8 @@ export const verifyOTP = catchAsyncError(async (req, res, next) => {
     const verificationCodeExpire = new Date(
       user.verificationCodeExpire
     ).getTime();
-    console.log(currentTime);
-    console.log(verificationCodeExpire);
+
+
     if (currentTime > verificationCodeExpire) {
       return next(new ErrorHandler("OTP Expired.", 400));
     }
@@ -217,6 +216,15 @@ export const verifyOTP = catchAsyncError(async (req, res, next) => {
     user.verificationCode = null;
     user.verificationCodeExpire = null;
     await user.save({ validateModifiedOnly: true });
+
+
+    // **Now increment `noOfLinkedEmp` for the manager**
+    if (user.role === "Employee" && user.linkedManagerKey) {
+       await User.findOneAndUpdate(
+        { managerKey: user.linkedManagerKey },
+        { $inc: { noOfLinkedEmp: 1 } }
+        );
+      }
 
     sendToken(user, 200, "Account Verified.", res);
   } catch (error) {

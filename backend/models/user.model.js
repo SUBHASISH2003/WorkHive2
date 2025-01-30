@@ -73,6 +73,18 @@ const userSchema = new mongoose.Schema({
   },
 });
 
+// Conditionally add fields only for managers
+userSchema.add({
+  noOfLinkedEmp: {
+    type: Number,
+    default: 0,
+  },
+  totalNoOfTaskCreated: {
+    type: Number,
+    default: 0,
+  },
+});
+
 // Virtual for DateOfBirth
 userSchema.virtual("DateOfBirth").set(function (dob) {
   const birthDate = new Date(dob);

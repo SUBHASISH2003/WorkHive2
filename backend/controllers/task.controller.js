@@ -41,6 +41,8 @@ export const createTask = async (req, res) => {
       createdBy: req.user._id,
     });
 
+    await User.findByIdAndUpdate(req.user._id, { $inc: { totalNoOfTaskCreated: 1 } });
+
     await task.save();
     res.status(201).json(task);
   } catch (error) {
