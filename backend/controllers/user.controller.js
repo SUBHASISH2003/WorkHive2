@@ -541,3 +541,44 @@ export const updateProfile = catchAsyncError(async (req, res, next) => {
     return next(new ErrorHandler("Failed to save user profile.", 500));
   }
 });
+
+
+
+// Update Organization Name (Only for Managers)
+export const updateOrganizationName = async (req, res) => {
+  try {
+    const { userId } = req.params; // Manager's ID
+    const { newOrganizationName } = req.body;
+
+    // Find the manager
+    const manager = await User.findById(userId);
+
+    if (!manager) {
+      return res.status(404).json({ message: "Manager not found." });
+    }
+
+    if (manager.role !== "Manager") {
+      return res.status(403).json({ message: "Only managers can update the organization name." });
+    }
+
+    // Update manager's organization name
+    manager.organizationName = newOrganizationName;
+    await manager.save();
+
+    // Update organization name for all linked employees
+    await User.updateMany(
+      { linkedManagerKey: manager.managerKey },
+      { $set: { organizationName: newOrganizationName } }
+    );
+
+    res.status(200).json({
+      message: "Organization name updated successfully.",
+      organizationName: newOrganizationName,
+    });
+
+  } catch (error) {
+    res.status(500).json({ message: "Internal Server Error", error: error.message });
+  }
+};
+
+

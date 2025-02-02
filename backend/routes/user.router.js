@@ -11,6 +11,7 @@ import {
   setNewPassword,
   getRoomDetails,
   updateProfile,
+  updateOrganizationName,
 
 } from "../controllers/user.controller.js";
 import { isAuthenticated } from "../middlewares/auth.js";
@@ -27,5 +28,7 @@ router.post("/password/validate-otp", validateOtp);
 router.put("/password/set-new", setNewPassword);
 router.get("/room/details/:managerKey",isAuthenticated, getRoomDetails);
 router.put("/update-profile", isAuthenticated, upload.single("profilePic"), updateProfile);
+router.put("/update-organization/:userId", isAuthenticated, updateOrganizationName);
+
 
 export default router;
