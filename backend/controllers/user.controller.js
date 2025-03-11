@@ -1,7 +1,9 @@
+import mongoose from "mongoose";
 import ErrorHandler from "../middlewares/error.js";
 import { catchAsyncError } from "../middlewares/catchAsyncError.js";
 import { User } from "../models/user.model.js";
 import { Task } from "../models/task.model.js";
+import { updateUserPerformance } from "../automation/updateUserPerformance.js";
 import { sendEmail } from "../utils/sendEmail.js";
 import { sendToken } from "../utils/sendToken.js";
 import crypto from "crypto";
@@ -233,9 +235,9 @@ export const verifyOTP = catchAsyncError(async (req, res, next) => {
 });
 
 export const login = catchAsyncError(async (req, res, next) => {
-  const { email, password } = req.body;
+  const { email, password, role } = req.body;
 
-  if (!email || !password) {
+  if (!email || !password || !role) {
     return next(new ErrorHandler("Email and password are required.", 400));
   }
   const user = await User.findOne({ email, accountVerified: true }).select(
@@ -244,6 +246,15 @@ export const login = catchAsyncError(async (req, res, next) => {
   if (!user) {
     return next(new ErrorHandler("Invalid email or password.", 400));
   }
+
+  
+  //role matching 
+  if(user.role != role){
+    return res.status(400).json({
+      message:"No user find on this role"
+    })
+  }
+
   const isPasswordMatched = await user.comparePassword(password);
   if (!isPasswordMatched) {
     return next(new ErrorHandler("Invalid email or password.", 400));
@@ -266,6 +277,11 @@ export const logout = catchAsyncError(async (req, res, next) => {
 
 export const getUser = catchAsyncError(async (req, res, next) => {
   const user = req.user;
+
+  if (user.role === "Employee") {
+    await updateUserPerformance(user._id); // Ensure latest stats before sending response
+  }
+
   res.status(200).json({
     success: true,
     user,
@@ -384,26 +400,11 @@ export const getRoomDetails = async (req, res) => {
   try {
     const { managerKey } = req.params;
 
-    // Ensure the user is authenticated and their data is in req.user (from middleware)
+    // Ensure the user is authenticated
     const loggedInUser = req.user;
 
     if (!loggedInUser) {
       return res.status(401).json({ message: "Unauthorized access. Please log in." });
-    }
-
-    // Check if the logged-in user is a manager or an employee
-    if (
-      loggedInUser.role === "Manager" &&
-      loggedInUser.managerKey !== managerKey
-    ) {
-      return res.status(403).json({ message: "You are not authorized to view this data." });
-    }
-
-    if (
-      loggedInUser.role === "Employee" &&
-      loggedInUser.linkedManagerKey !== managerKey
-    ) {
-      return res.status(403).json({ message: "You are not authorized to view this data." });
     }
 
     // Fetch the manager based on managerKey
@@ -416,77 +417,71 @@ export const getRoomDetails = async (req, res) => {
     // Fetch all employees linked to this manager
     const employees = await User.find({ linkedManagerKey: managerKey, role: "Employee" });
 
-    // Fetch employee performance and task stats for each employee
-    const employeeData = await Promise.all(
-      employees.map(async (employee) => {
-        // Find tasks where the employee is assigned
-        const tasks = await Task.find({ assignedEmployees: employee._id });
+    // If the logged-in user is an Employee, show only limited data
+    if (loggedInUser.role === "Employee") {
+      if (loggedInUser.linkedManagerKey !== managerKey) {
+        return res.status(403).json({ message: "You are not authorized to view this data." });
+      }
 
-        // Initialize task counters
-        let acceptedTasks = 0;
-        let rejectedTasks = 0;
-        let completedTasks = 0;
-        let failedTasks = 0;
-        let pendingTasks = 0;
+      const response = {
+        managerKey: manager.managerKey,
+        manager: {
+          name: manager.name,
+          email: manager.email,
+        },
+        employees: employees.map((emp) => ({
+          name: emp.name,
+          email: emp.email,
+          profilePic: emp.profilePic,
+        })),
+      };
 
-        // Process each task
-        tasks.forEach((task) => {
-          const response = task.employeeResponses.find(
-            (resp) => resp.employee.toString() === employee._id.toString()
-          );
+      return res.status(200).json({ message: "Employee details fetched successfully.", data: response });
+    }
 
-          if (response) {
-            // Count tasks based on the `response` and `status`
-            if (response.response === "accept") acceptedTasks++;
-            if (response.response === "reject") rejectedTasks++;
+    // If the logged-in user is a Manager, fetch all employee performance and task stats
+    if (loggedInUser.role === "Manager") {
+      if (loggedInUser.managerKey !== managerKey) {
+        return res.status(403).json({ message: "You are not authorized to view this data." });
+      }
 
-            if (response.status === "completed") completedTasks++;
-            if (response.status === "failed") failedTasks++;
-            if (response.status === "pending") pendingTasks++;
-          }
-        });
+      const employeeData = employees.map((employee) => ({
+        name: employee.name,
+        email: employee.email,
+        profilePic: employee.profilePic,
+        totalNoOfAssignTask: employee.totalNoOfAssignTask,
+        totalCompletedTasks: employee.totalCompletedTasks,
+        totalAcceptedTasks: employee.totalAcceptedTasks,
+        totalRejectedTasks: employee.totalRejectedTasks,
+        totalPendingTasks: employee.totalPendingTasks,
+        totalFailedTasks: employee.totalFailedTasks,
+        performance: `${employee.performance.toFixed(2)}%`,
+        grade: employee.grade,
+      }));
 
-        // Calculate performance percentage
-        const totalTasks = completedTasks + failedTasks + pendingTasks;
-        const performance = totalTasks > 0 ? (completedTasks / totalTasks) * 100 : 0;
+      const response = {
+        managerKey: manager.managerKey,
+        manager: {
+          name: manager.name,
+          email: manager.email,
+          noOfLinkedEmp: manager.noOfLinkedEmp,
+          totalNoOfTaskCreated: manager.totalNoOfTaskCreated,
+        },
+        employees: employeeData,
+      };
 
-        // Return employee data with task stats
-        return {
-          name: employee.name,
-          email: employee.email,
-          performance: `${performance.toFixed(2)}%`,
-          totalAcceptedTasks: acceptedTasks,
-          totalRejectedTasks: rejectedTasks,
-          totalCompletedTasks: completedTasks,
-          totalPendingTasks: pendingTasks,
-          totalFailedTasks: failedTasks,
-        };
-      })
-    );
+      return res.status(200).json({ message: "Manager and employees fetched successfully.", data: response });
+    }
 
-    // Structure the response to include manager info and employees with performance and task stats
-    const response = {
-      managerKey: manager.managerKey,
-      manager: {
-        name: manager.name,
-        email: manager.email,
-      },
-      employees: employeeData,
-    };
-
-    return res.status(200).json({ message: "Manager and employees fetched successfully.", data: response });
+    return res.status(403).json({ message: "You are not authorized to access this data." });
   } catch (error) {
     return res.status(500).json({ message: error.message });
   }
 };
 
-
-
-
-
 export const updateProfile = catchAsyncError(async (req, res, next) => {
-  const { bio } = req.body;
-
+  const { bio, organizationName } = req.body;
+  
   // Ensure the user is logged in
   const userId = req.user._id;
 
@@ -521,9 +516,22 @@ export const updateProfile = catchAsyncError(async (req, res, next) => {
     }
   }
 
-  // Update the fields if provided
+  // Update bio if provided
   if (bio) user.bio = bio;
   user.profilePic = profilePicUrl;
+
+  // Allow organizationName update only if the user is a Manager
+  if (organizationName && user.role === "Manager") {
+    user.organizationName = organizationName;
+
+    // Update all linked employees with the new organization name
+    await User.updateMany(
+      { linkedManagerKey: user.managerKey },
+      { $set: { organizationName } }
+    );
+  } else if (organizationName) {
+    return next(new ErrorHandler("Only managers can update organization name.", 403));
+  }
 
   // Save the updated user
   try {
@@ -535,6 +543,7 @@ export const updateProfile = catchAsyncError(async (req, res, next) => {
       user: {
         bio: user.bio,
         profilePic: user.profilePic,
+        organizationName: user.organizationName,
       },
     });
   } catch (error) {
@@ -542,43 +551,58 @@ export const updateProfile = catchAsyncError(async (req, res, next) => {
   }
 });
 
-
-
-// Update Organization Name (Only for Managers)
-export const updateOrganizationName = async (req, res) => {
+export const deleteLinkedEmployee = async (req, res) => {
   try {
-    const { userId } = req.params; // Manager's ID
-    const { newOrganizationName } = req.body;
+    const { employeeId } = req.params;
+    const managerId = req.user.id;
 
-    // Find the manager
-    const manager = await User.findById(userId);
-
-    if (!manager) {
-      return res.status(404).json({ message: "Manager not found." });
+    // Validate MongoDB ObjectId
+    if (!mongoose.Types.ObjectId.isValid(employeeId)) {
+      return res.status(400).json({ message: "Invalid employee ID format." });
     }
 
-    if (manager.role !== "Manager") {
-      return res.status(403).json({ message: "Only managers can update the organization name." });
+    // Find the manager and ensure they have the right role
+    const manager = await User.findById(managerId);
+    if (!manager || manager.role !== "Manager") {
+      return res.status(403).json({ message: "Access denied. Only managers can delete employees." });
     }
 
-    // Update manager's organization name
-    manager.organizationName = newOrganizationName;
-    await manager.save();
+    // Find the employee while ensuring they belong to the manager
+    const employee = await User.findOne({ _id: employeeId, linkedManagerKey: manager.managerKey, role: "Employee" });
+    if (!employee) {
+      return res.status(404).json({ message: "Employee not found or not linked to this manager." });
+    }
 
-    // Update organization name for all linked employees
-    await User.updateMany(
-      { linkedManagerKey: manager.managerKey },
-      { $set: { organizationName: newOrganizationName } }
-    );
+    // Delete the employee and atomically update manager's linked employee count
+    await User.findByIdAndDelete(employeeId);
+    await User.findByIdAndUpdate(managerId, { $inc: { noOfLinkedEmp: -1 } });
 
-    res.status(200).json({
-      message: "Organization name updated successfully.",
-      organizationName: newOrganizationName,
-    });
-
+    res.status(200).json({ message: "Employee successfully removed." });
   } catch (error) {
-    res.status(500).json({ message: "Internal Server Error", error: error.message });
+    console.error("Error deleting employee:", error);
+    res.status(500).json({ message: "Internal server error", error: error.message });
   }
 };
 
+export const orgName = catchAsyncError(async (req, res, next) => {
+  const { managerKey } = req.body;
 
+  if (!managerKey) {
+    return next(new ErrorHandler("Manager key is required.", 400));
+  }
+
+  try {
+    const manager = await User.findOne({ managerKey });
+
+    if (!manager) {
+      return next(new ErrorHandler("Invalid manager key.", 404));
+    }
+
+    res.status(200).json({
+      success: true,
+      orgName: manager.organizationName,
+    });
+  } catch (error) {
+    next(new ErrorHandler("Internal server error.", 500));
+  }
+});

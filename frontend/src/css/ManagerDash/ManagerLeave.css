@@ -1,0 +1,63 @@
+.ManagerLeaveMainCon{
+    height: auto;
+    margin-top: 5rem;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+}
+.buttonRow{
+    width: 100%;
+    padding: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-evenly;
+}
+.buttonRow button{
+    padding: 1rem;
+    border: 2px solid transparent;
+    outline: none;
+    background-color: #111;
+    color: #fff;
+    cursor: pointer;
+    border-radius: 10px;
+    font-weight: 700;
+    transition: all 0.3s ease-in-out;
+}
+.buttonRow button:hover {
+    background-color: #fff;
+    color: black;
+}
+
+.buttonRow button:hover .link{
+    color: black !important;
+}
+
+.buttonRow button .link {
+    text-decoration: none;
+    color: #fff;
+}
+.leaveCards{
+    width: 80%;
+    display: flex;
+    align-items: center;
+    justify-content: space-evenly;
+}
+.ButtonActive{
+    /* background-color: #fff !important; */
+    background-color: rgb(13, 199, 232) !important;
+    & .link{
+        color: black !important;
+    }
+    
+}
+@media screen and (max-width:400px) {
+    .buttonRow{
+        flex-direction: column;
+        gap: 0.4rem;
+    }
+    .buttonRow button{
+        width: 100%;
+    }
+}

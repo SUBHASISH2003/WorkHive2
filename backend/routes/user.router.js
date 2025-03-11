@@ -11,7 +11,8 @@ import {
   setNewPassword,
   getRoomDetails,
   updateProfile,
-  updateOrganizationName,
+  deleteLinkedEmployee,
+  orgName
 
 } from "../controllers/user.controller.js";
 import { isAuthenticated } from "../middlewares/auth.js";
@@ -20,6 +21,7 @@ const router = express.Router();
 
 router.post("/register", register);
 router.post("/otp-verification", verifyOTP);
+router.post("/getorgname",orgName);
 router.post("/login", login);
 router.get("/logout", isAuthenticated, logout);
 router.get("/me", isAuthenticated, getUser);
@@ -28,7 +30,6 @@ router.post("/password/validate-otp", validateOtp);
 router.put("/password/set-new", setNewPassword);
 router.get("/room/details/:managerKey",isAuthenticated, getRoomDetails);
 router.put("/update-profile", isAuthenticated, upload.single("profilePic"), updateProfile);
-router.put("/update-organization/:userId", isAuthenticated, updateOrganizationName);
-
+router.delete("/delete/:employeeId", isAuthenticated, deleteLinkedEmployee);
 
 export default router;

@@ -1,0 +1,130 @@
+.SignUpMain {
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Center align the content */
+    justify-content: flex-start; /* Adjust alignment for better responsiveness */
+    height: auto;
+    width: 100%;
+    padding: 1rem;
+    box-sizing: border-box;
+    overflow-y: auto;
+}
+.SignUpMain p{
+    margin-top: 20px;
+}
+.SignUpMain h3{
+    margin-bottom: 10px;
+}
+
+.formGroup {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.SignUpForm {
+    width: 100%;
+    max-width: 800px; /* Restrict the form width for larger screens */
+    display: flex;
+    flex-direction: row; /* Keep row layout for larger screens */
+    flex-wrap: wrap;
+    gap: 1rem; /* Add spacing between form groups */
+    overflow-y: auto;
+    align-items: flex-start; /* Align items at the top */
+    justify-content: space-between;
+    box-sizing: border-box;
+
+    /* Webkit Scrollbar Styles */
+    scrollbar-width: thin; /* Firefox */
+    scrollbar-color: #71C9CE #eeeeee; /* Firefox scrollbar color (thumb and track) */
+    
+}
+.formGroup input,
+.formGroup select {
+    padding: 10px;
+    margin-top: 5px;
+    border: none;
+    font-weight: 700;
+    width: 100%; /* Make inputs full width */
+    background-color: rgb(225, 228, 231);
+    border-radius: 1rem;
+    font-size: calc(0.9rem + 0.2vw); /* Responsive font size */
+}
+.formGroup input:focus,
+.formGroup select:focus {
+    outline: none; /* Remove default focus outline */
+    background-color: rgb(200, 230, 255); /* Light blue for focus */
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5); /* Add subtle shadow */
+}
+
+.formGroup label {
+    margin-top: 1rem;
+    font-size: calc(0.8rem + 0.2vw); /* Responsive font size */
+}
+
+.space {
+    height: 50px; /* Adjust height for spacing */
+}
+.Create{
+    padding: 10px;
+    font-weight: 700;
+    border: none;
+    outline: noen;
+    background-color: #71C9CE;
+    border-radius: 10px;
+    width: 60%;
+    cursor: pointer;
+    margin-bottom: 10px;
+    font-size: 1rem;
+    transition: all 0.3s ease-in-out;
+}
+.Create:hover{
+    background-color: black;
+    color: white;
+}
+.Create .link{
+    color: black;
+    text-decoration: none;
+    transition: all 0.3s ease-in-out;
+}
+.Create:hover .link{
+    color: white;
+}
+.errorText{
+    color: red;
+}
+/* Media Queries for Tablets */
+@media (max-width: 768px) {
+    .SignUpForm {
+        flex-direction: column; /* Stack form groups vertically */
+        align-items: center;
+        justify-content: center;
+        gap: 1rem; /* Maintain spacing */
+    }
+
+    .formGroup input,
+    .formGroup select {
+        max-width: 100%; /* Full width inputs */
+    }
+}
+
+/* Media Queries for Mobile Devices */
+@media (max-width: 480px) {
+    .SignUpMain {
+        padding: 0.5rem; /* Reduce padding for smaller screens */
+    }
+
+    .SignUpForm {
+        padding: 0;
+    }
+
+    .formGroup label {
+        font-size: calc(0.7rem + 0.2vw); /* Slightly smaller font */
+    }
+
+    .formGroup input,
+    .formGroup select {
+        font-size: calc(0.8rem + 0.2vw);
+        padding: 8px; /* Adjust padding for smaller screens */
+    }
+}

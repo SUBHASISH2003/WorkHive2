@@ -1,0 +1,151 @@
+/* Root Variables */
+:root {
+    --taskDetails-primary-bg: #3b1e54;
+    --taskDetails-card-bg: #1e1428;
+    --taskDetails-text-color: #ffffff;
+    --taskDetails-border-color: #d4bee4;
+    --taskDetails-accent-color: #2c0632;
+    --taskDetails-light-bg: #eeeeee;
+  }
+  
+  /* Task Details Container */
+  .taskDetails-container {
+    max-width: 900px;
+    margin: 20px auto;
+    padding: 20px;
+    background: var(--taskDetails-light-bg);
+    border-radius: 12px;
+    box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Title & Description */
+  .taskDetails-title {
+    font-size: 2rem;
+    color: var(--taskDetails-primary-bg);
+    margin-bottom: 10px;
+  }
+  
+  .taskDetails-description {
+    font-size: 1.1rem;
+    color: var(--taskDetails-accent-color);
+    margin-bottom: 20px;
+  }
+  
+  /* Meta Info */
+  .taskDetails-meta {
+    display: flex;
+    justify-content: space-between;
+    font-size: 1rem;
+    font-weight: bold;
+    background: var(--taskDetails-card-bg);
+    padding: 10px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    color: var(--taskDetails-text-color);
+  }
+  
+  /* Sections */
+  .taskDetails-section {
+    margin-bottom: 20px;
+  }
+  
+  .taskDetails-section h2 {
+    font-size: 1.5rem;
+    color: var(--taskDetails-primary-bg);
+    margin-bottom: 10px;
+  }
+  
+  /* Employee List */
+  .taskDetails-employeeList {
+    list-style: none;
+    padding: 0;
+    width: 100%;
+  }
+  
+  .taskDetails-employeeCard {
+    background: lightblue;
+    color: black;
+    padding: 10px;
+    border-radius: 8px;
+    margin-bottom: 5px;
+    font-size: 1.2rem;
+    min-width: 60%;
+  }
+  
+  /* Created By */
+  .taskDetails-creator {
+    font-size: 1.1rem;
+    font-weight: bold;
+    color: var(--taskDetails-accent-color);
+  }
+  
+  /* Employee Responses */
+  .taskDetails-responseList {
+    list-style: none;
+    padding: 0;
+  }
+  
+  .taskDetails-responseCard {
+    background: var(--taskDetails-card-bg);
+    padding: 10px;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    color: var(--taskDetails-text-color);
+  }
+  
+  .taskDetails-responseEmployee {
+    font-weight: bold;
+  }
+  
+  .taskDetails-responseStatus {
+    color: #ffd700;
+  }
+  
+  .taskDetails-responseText {
+    font-style: italic;
+  }
+  
+  /* No Responses */
+  .taskDetails-noResponse {
+    font-size: 1.1rem;
+    color: var(--taskDetails-primary-bg);
+    text-align: center;
+  }
+  
+  /* Loading */
+  .taskDetails-loading {
+    font-size: 1.2rem;
+    text-align: center;
+    margin-top: 20px;
+  }
+  
+  /* Responsive Design */
+  @media (max-width: 768px) {
+    .taskDetails-meta {
+      flex-direction: column;
+      text-align: center;
+    }
+  
+    .taskDetails-title {
+      font-size: 1.8rem;
+    }
+  
+    .taskDetails-description {
+      font-size: 1rem;
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .taskDetails-title {
+      font-size: 1.6rem;
+    }
+  
+    .taskDetails-description {
+      font-size: 0.95rem;
+    }
+  
+    .taskDetails-meta {
+      font-size: 0.9rem;
+    }
+  }
+  

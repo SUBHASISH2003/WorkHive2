@@ -1,0 +1,127 @@
+/* ManagerRoom.css */
+.ManagerRoomMainCon{
+    height: 100%;
+    width: 100%;
+    padding-top: 5rem;
+}
+.manager-room {
+    padding: 20px;
+    text-align: center;
+    /* background-color: #f8f9fa; */
+    
+  }
+  
+  h1 {
+    font-size: 2rem;
+    margin-bottom: 20px;
+    color: #333;
+  }
+  
+  .employee-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+    padding: 10px;
+    justify-content: center;
+  }
+  
+  .employeeManager-card {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    transition: transform 0.3s ease-in-out;
+  }
+  
+  .employee-card:hover {
+    transform: translateY(-5px);
+  }
+  .employee-card img{
+    width: 5rem;
+    height: 5rem;
+  }
+  .profile-pic {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-bottom: 10px;
+  }
+  
+  .email {
+    color: #555;
+    font-size: 0.9rem;
+    margin-bottom: 10px;
+  }
+  
+  .performance {
+    font-weight: bold;
+    padding: 5px 10px;
+    border-radius: 5px;
+    display: inline-block;
+    margin-bottom: 10px;
+  }
+  
+  /* Performance Colors */
+  .performance.excellent {
+    color: #28a745;
+    background: #d4edda;
+  }
+  
+  .performance.good {
+    color: #007bff;
+    background: #cce5ff;
+  }
+  
+  .performance.average {
+    color: #ffc107;
+    background: #fff3cd;
+  }
+  .performance.bad{
+    color: crimson;
+    background: #ff9d9d;
+  }
+  
+  .task-info {
+    text-align: left;
+    font-size: 0.9rem;
+    line-height: 1.5;
+  }
+  
+  .task-info p {
+    margin: 5px 0;
+  }
+  .removeEmployee {
+    padding: 0.6rem;
+    width: 100%;
+    border: none;
+    background-color: crimson;
+    border-radius: 10px;
+    color: white;
+    font-weight: 700;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: all 0.3s ease-in-out;
+    box-shadow: 0 4px 8px rgba(220, 20, 60, 0.3);
+  }
+  
+  .removeEmployee:hover {
+    background-color: #b31239;
+    /* box-shadow: 0 6px 12px rgba(220, 20, 60, 0.5);
+    transform: translateY(-2px); */
+  }
+  
+  .removeEmployee:active {
+    background-color: #8b0e2c;
+    /* box-shadow: 0 2px 4px rgba(220, 20, 60, 0.3); */
+    /* transform: translateY(1px); */
+  }
+  
+  /* Responsive Design */
+  @media (max-width: 600px) {
+    .employee-grid {
+      grid-template-columns: repeat(auto-fit, minmax(100%, 1fr));
+    }
+  }
+  

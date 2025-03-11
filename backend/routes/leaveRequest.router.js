@@ -2,6 +2,7 @@ import express from "express";
 import {
   submitLeaveRequest,
   getLeaveRequests,
+  getLeaveRequestsByStatus,
   updateLeaveRequestStatus,
 } from "../controllers/leaveRequest.controller.js";
 import { isAuthenticated } from "../middlewares/auth.js";
@@ -14,7 +15,9 @@ router.post("/create", isAuthenticated, submitLeaveRequest);
 // Manager & Employee: Get leave requests
 router.get("/get", isAuthenticated, getLeaveRequests);
 
+router.get("/status/:status", isAuthenticated, getLeaveRequestsByStatus);
+
 // Manager: Update leave request status (approve/reject)
-router.patch("/status/:leaveRequestId", isAuthenticated, updateLeaveRequestStatus);
+router.patch("/status/update/:leaveRequestId", isAuthenticated, updateLeaveRequestStatus);
 
 export const leaveRoutes = router;

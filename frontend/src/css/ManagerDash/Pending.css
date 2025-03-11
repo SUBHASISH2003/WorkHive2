@@ -1,0 +1,159 @@
+/* Container for the list of leave requests */
+.manager-pending-container {
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: start; /* Centers cards properly on smaller screens */
+    gap: 20px;
+    margin-top: 30px;
+    padding: 1rem;
+}
+
+/* Card Design */
+.manager-leave-card {
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    width: 350px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    transition: 0.3s;
+}
+
+.manager-leave-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Employee Info */
+.manager-employee-info {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.manager-profile-pic {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #9B7EBD;
+}
+
+.manager-employee-details h3 {
+    margin: 0;
+    font-size: 18px;
+    color: #3B1E54;
+}
+
+.manager-leave-type {
+    font-size: 14px;
+    color: #9B7EBD;
+    font-weight: bold;
+}
+
+/* Leave Details */
+.manager-leave-details p {
+    margin: 5px 0;
+    font-size: 14px;
+    color: #495057;
+}
+
+.manager-leave-description {
+    font-style: italic;
+    color: #3B1E54;
+}
+
+/* Action Buttons */
+.manager-action-buttons {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.manager-accept-btn, .manager-reject-btn {
+    padding: 8px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: 0.3s;
+    width: 48%; /* Makes buttons responsive */
+    text-align: center;
+}
+
+.manager-accept-btn {
+    background: #28a745;
+    color: white;
+}
+
+.manager-accept-btn:hover {
+    background: #218838;
+}
+
+.manager-reject-btn {
+    background: #dc3545;
+    color: white;
+}
+
+.manager-reject-btn:hover {
+    background: #c82333;
+}
+
+/* RESPONSIVENESS */
+
+/* Tablets */
+@media (max-width: 1024px) {
+    .manager-pending-container {
+        flex-direction: row !important;
+        justify-content: center;
+    }
+
+    .manager-leave-card {
+        width: 100%;
+    }
+}
+
+/* Mobile Devices */
+@media (max-width: 768px) {
+    .manager-pending-container {
+        /* flex-direction: column; */
+        gap: 15px;
+        padding: 0.5rem;
+    }
+
+    .manager-leave-card {
+        width: 100%;
+    }
+
+    .manager-profile-pic {
+        width: 50px;
+        height: 50px;
+    }
+
+    .manager-employee-details h3 {
+        font-size: 16px;
+    }
+
+    .manager-leave-type {
+        font-size: 13px;
+    }
+
+    .manager-leave-details p {
+        font-size: 13px;
+    }
+
+    .manager-action-buttons {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .manager-accept-btn, .manager-reject-btn {
+        width: 100%;
+        padding: 10px;
+        font-size: 14px;
+    }
+}

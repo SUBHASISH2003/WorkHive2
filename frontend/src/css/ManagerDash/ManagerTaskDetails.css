@@ -1,0 +1,161 @@
+/* Root Variables */
+:root {
+  --primary-bg: #3b1e54;
+  --card-bg: #9b7ebd;
+  --text-color: #ffffff;
+  --border-color: #d4bee4;
+  --accent-color: #2c0632;
+}
+
+/* Task Container */
+.manager-task-container {
+  width: 100%;
+  margin: auto;
+  padding: 5px;
+}
+
+/* Header */
+.manager-task-header {
+  font-size: 2rem;
+  color: var(--accent-color);
+  margin-bottom: 20px;
+}
+
+/* Task List */
+.manager-task-list {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: start;
+  align-items: stretch; /* Ensures all cards take equal height */
+  overflow-y: auto;
+  gap: 20px;
+}
+
+/* Task Card */
+.manager-task-card {
+  background: var(--card-bg);
+  border-radius: 12px;
+  width: 31%;
+  min-height: 320px; /* Set a minimum height */
+  display: flex;
+  flex-direction: column; /* Ensures content aligns properly */
+  justify-content: space-between; /* Keeps elements aligned */
+  padding: 20px;
+  text-align: left;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  border: 2px solid var(--border-color);
+}
+
+/* Ensure consistent height for all task cards */
+.manager-task-card > * {
+  flex-grow: 1;
+}
+.TaskDetBtn {
+  padding: 8px 12px; /* Adjust padding for consistency */
+  height: 35px; /* Set a fixed height */
+  border: 2px solid #fff;
+  outline: none;
+  background-color: #3c0547;
+  color: #fff;
+  font-weight: 700;
+  cursor: pointer;
+  border-radius: 30px;
+  font-size: 1rem;
+  display: flex; /* Ensures proper alignment */
+  align-items: center; /* Center text vertically */
+  justify-content: center; /* Center text horizontally */
+  white-space: nowrap; /* Prevents text wrapping */
+}
+
+/* Task Title */
+.manager-task-title {
+  font-size: 1.6rem;
+  margin-bottom: 10px;
+  color: var(--primary-bg);
+}
+
+/* Task Description */
+.manager-task-description {
+  font-size: 1rem;
+  margin-bottom: 15px;
+  color: var(--text-color);
+  flex-grow: 1; /* Ensures description expands evenly */
+}
+
+/* Deadline & Task Info */
+.manager-task-deadline,
+.manager-task-type,
+.manager-task-creator {
+  font-size: 0.9rem;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+/* Assigned Employees */
+.manager-task-assignees {
+  margin-top: 10px;
+}
+
+.manager-task-assignees ul {
+  list-style: none;
+  padding: 0;
+}
+
+.manager-task-assignees li {
+  font-size: 0.9rem;
+  color: var(--primary-bg);
+  background: rgba(255, 255, 255, 0.1);
+  padding: 5px 10px;
+  border-radius: 5px;
+  margin-top: 5px;
+}
+
+/* No Task Message */
+.manager-no-tasks {
+  font-size: 1.2rem;
+  color: var(--text-color);
+  margin-top: 20px;
+  text-align: center;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .manager-task-card {
+    width: 45%;
+  }
+}
+
+@media (max-width: 768px) {
+  .manager-task-container {
+    padding: 5px;
+  }
+
+  .manager-task-header {
+    font-size: 1.8rem;
+  }
+  
+  .manager-task-list {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .manager-task-card {
+    width: 90%;
+    padding: 15px;
+  }
+}
+
+@media (max-width: 480px) {
+  .manager-task-header {
+    font-size: 1.5rem;
+  }
+
+  .manager-task-card {
+    width: 95%;
+    padding: 12px;
+  }
+
+  .manager-task-title {
+    font-size: 1.4rem;
+  }
+}

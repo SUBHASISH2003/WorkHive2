@@ -1,0 +1,108 @@
+/* Container for the section */
+.emp-rejected-container {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  /* Title styling */
+  .emp-rejected-title {
+    font-size: 24px;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 20px;
+  }
+  
+  /* Container for the leave cards */
+  .emp-rejected-cards {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    justify-content: flex-start;
+  }
+  
+  /* Individual leave card styling */
+  .emp-rejected-leave-card {
+    background: white;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+    padding: 20px;
+    width: 100%;
+    max-width: 400px;
+    border: 1px solid #ddd;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  /* Card content structure */
+  .emp-rejected-card-content {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  /* Header styling */
+  .emp-rejected-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  /* Leave type styling */
+  .emp-rejected-leave-type {
+    font-size: 18px;
+    font-weight: bold;
+    color: #2c3e50;
+  }
+  
+  /* Status box styling */
+  .emp-rejected-status {
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-size: 14px;
+    font-weight: bold;
+  }
+  
+  .emp-rejected-status.rejected {
+    background-color: #e74c3c;
+    color: white;
+  }
+  
+  /* Description styling */
+  .emp-rejected-description {
+    font-size: 14px;
+    color: #555;
+  }
+  
+  /* Date container */
+  .emp-rejected-date-container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  /* Date details */
+  .emp-rejected-date {
+    display: flex;
+    gap: 5px;
+  }
+  
+  /* "From" and "To" text styling */
+  .emp-rejected-to-text {
+    font-weight: bold;
+    color: #888;
+  }
+  
+  /* Total days counter */
+  .emp-rejected-total-days {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 16px;
+    font-weight: bold;
+    color: #2980b9;
+  }
+  

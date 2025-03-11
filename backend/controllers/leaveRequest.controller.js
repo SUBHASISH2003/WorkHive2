@@ -201,3 +201,36 @@ export const updateLeaveRequestStatus = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
+// Get Leave Requests by Status
+export const getLeaveRequestsByStatus = async (req, res) => {
+  try {
+    const { role, managerKey, email } = req.user;
+    const { status } = req.params;
+
+    if (!["pending", "approved", "rejected"].includes(status)) {
+      return res.status(400).json({ message: "Invalid status value." });
+    }
+
+    let leaveRequests = [];
+
+    if (role === "Manager") {
+      // Get employees linked to the manager
+      const employees = await User.find({ linkedManagerKey: managerKey }, "email");
+      const employeeEmails = employees.map((employee) => employee.email);
+
+      // Fetch leave requests for linked employees with the given status
+      leaveRequests = await LeaveRequest.find({ email: { $in: employeeEmails }, status });
+    } else if (role === "Employee") {
+      // Employee can only view their own leave requests with the given status
+      leaveRequests = await LeaveRequest.find({ email, status });
+    } else {
+      return res.status(403).json({ message: "Unauthorized access." });
+    }
+
+    res.status(200).json(leaveRequests);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+

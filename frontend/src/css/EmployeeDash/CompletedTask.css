@@ -1,0 +1,118 @@
+/* Unique class names for Completed Tasks in Employee Dashboard */
+
+/* Container for the whole section */
+.completed-container-employee-dash {
+    padding: 20px;
+    background-color: #f4f7fc;
+    width: 85%;
+    margin: 0 auto;
+}
+
+.completed-title {
+    text-align: center;
+    color: #3b1e54;
+    font-size: 28px;
+    margin-bottom: 30px;
+}
+
+/* Main task list wrapper */
+.completed-task-list {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    overflow-y: auto;
+    max-height: 600px; /* Adjust the max height for scroll */
+    padding: 10px;
+    border-radius: 8px;
+    background-color: #fff;
+}
+
+/* Individual task card style */
+.completed-task-card {
+    background-color: #d4f8e2; /* Green color to signify completion */
+    border-radius: 8px;
+    padding: 15px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease-in-out;
+}
+
+.completed-task-card:hover {
+    transform: translateY(-5px);
+}
+
+/* Task header (Title + Deadline) */
+.completed-task-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.completed-task-title {
+    font-size: 20px;
+    font-weight: bold;
+    color: #3b1e54;
+    flex: 1;
+    margin-right: 10px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis; /* Ensures long titles don't overflow */
+}
+
+.completed-task-deadline {
+    font-size: 14px;
+    color: #495057;
+    background-color: #f3f4f6;
+    padding: 5px 10px;
+    border-radius: 4px;
+}
+
+/* Task description */
+.completed-task-description {
+    font-size: 14px;
+    color: #495057;
+    line-height: 1.5;
+    margin: 10px 0;
+    max-height: 80px; /* Limiting height */
+    overflow-y: auto; /* Scroll if the content overflows */
+    text-overflow: ellipsis; /* Indicate overflow with ellipsis */
+    white-space: normal; /* Allow text to wrap */
+}
+
+/* Footer (Employees Assigned) */
+.completed-task-footer {
+    margin-top: 10px;
+    font-size: 14px;
+    color: #495057;
+}
+
+.completed-assigned-employees {
+    background-color: #9b7ebd;
+    color: white;
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-weight: bold;
+}
+
+/* Responsiveness: Mobile Devices */
+@media (max-width: 768px) {
+    .completed-task-list {
+        max-height: 500px;
+    }
+
+    .completed-task-card {
+        padding: 10px;
+    }
+
+    .completed-task-title {
+        font-size: 18px;
+    }
+
+    .completed-task-description {
+        max-height: 60px; /* Adjust for smaller screens */
+    }
+
+    .completed-assigned-employees {
+        font-size: 12px;
+    }
+}

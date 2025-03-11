@@ -1,0 +1,143 @@
+.DashBoardMainScreen {
+  width: 100%;
+  min-height: 100vh;
+  padding-top: 6rem;
+  display: flex;
+  align-items: start;
+  justify-content: center;
+  /* background-color: #f8f9fa; */
+}
+
+.DashContainer {
+  width: 80%;
+  display: flex;
+  align-items: center;
+  justify-content: space-evenly;
+  flex-wrap: wrap; /* Ensure content wraps on smaller screens */
+  gap: 1rem;
+  transition: all 0.3s ease-in-out;
+}
+
+.ManagerDetails {
+  width: 60%;
+  padding: 1rem;
+  /* background-color: #fff; */
+  background: #000;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  display: flex;
+  flex-wrap: wrap; /* Wraps content */
+  justify-content: space-between;
+  gap: 1rem;
+  transition: all 0.3s ease-in-out;
+}
+
+.DetailsBox {
+  flex: 1 1 30%; /* Flexible width */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: start;
+  padding: 1rem;
+  border-right: 2px solid #dee2e6;
+  transition: all 0.3s ease-in-out;
+}
+
+.DetailsBox:last-child {
+  border-right: none;
+}
+
+.DetailsBox p {
+  font-size: clamp(1rem, 2.5vw, 2rem); /* Responsive font scaling */
+  margin-top: 1.5rem;
+  color: #17a2b8;
+  text-align: center;
+}
+.createTaskCon{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  gap: 10px;
+}
+
+/* Responsive Breakpoints */
+@media screen and (max-width: 1200px) {
+  .DashContainer {
+    width: 90%;
+  }
+  .ManagerDetails {
+    width: 100%;
+  }
+  .createTaskCon img{
+    width: 40%;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .DashContainer {
+    flex-direction: column;
+    width: 95%;
+  }
+  .createTaskCon{
+    flex-direction: column;
+  }
+  .createTaskCon img{
+    height: 40%;
+  }
+  .ManagerDetails {
+    width: 100%;
+    padding: 1.5rem;
+  }
+
+  .DetailsBox {
+    flex: 1 1 100%; /* Full width for small screens */
+    border-right: none; /* Remove divider */
+  }
+
+  .DetailsBox p {
+    font-size: clamp(0.9rem, 2vw, 1.5rem);
+  }
+}
+
+@media screen and (max-width: 576px) {
+  .DashBoardMainScreen {
+    padding-top: 4rem;
+  }
+
+  .DashContainer {
+    width: 100%;
+    gap: 1rem;
+  }
+
+  .ManagerDetails {
+    padding: 1rem;
+    gap: 0.5rem;
+  }
+
+  .DetailsBox {
+    padding: 0.5rem;
+  }
+
+  .DetailsBox p {
+    font-size: 1rem;
+  }
+}
+
+@media screen and (max-width: 375px) {
+  .DetailsBox p {
+    font-size: 0.9rem;
+  }
+}
+
+@media screen and (max-width: 320px) {
+  .DashContainer {
+    gap: 0.5rem;
+  }
+  .DetailsBox {
+    padding: 0.25rem;
+  }
+  .DetailsBox p {
+    font-size: 0.8rem;
+  }
+}

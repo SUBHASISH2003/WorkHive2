@@ -1,0 +1,108 @@
+/* General Styling for the Employee Room */
+.employee-room {
+  padding: 20px;
+  margin-top: 6rem;
+}
+  
+  /* Manager Section */
+  .manager-section {
+    margin-bottom: 40px;
+    width: 100%;
+  }
+  
+  .manager-card {
+    
+    display: flex;
+    align-items: center;
+    background: #eeb5f0;
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  .manager-card .profile-pic {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    margin-right: 20px;
+  }
+  
+  .manager-details h3 {
+    font-size: 1.5rem;
+    color: #3B1E54;
+    margin: 0;
+  }
+  
+  .manager-details p {
+    margin: 5px 0;
+    font-size: 1rem;
+    color: #495057;
+  }
+  
+  /* Employees Section */
+  .employees-section {
+    margin-bottom: 40px;
+    width: 100%;
+  }
+  
+  .employees-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+  }
+  
+  .employee-card {
+    display: flex;
+    align-items: center;
+    /* background-color: #f8f9fa; */
+    background: #9ec5f4;
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    width: calc(33.33% - 20px);
+  }
+  
+  .employee-card .profile-pic {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    margin-right: 15px;
+  }
+  
+  .employee-details h3 {
+    font-size: 1.2rem;
+    color: #3B1E54;
+    margin: 0;
+  }
+  
+  .employee-details p {
+    margin: 5px 0;
+    font-size: 1rem;
+    color: #495057;
+  }
+  
+  /* Responsive Design */
+  @media (max-width: 1024px) {
+    .employee-card {
+      width: calc(50% - 20px); /* Two cards per row */
+    }
+  }
+  
+  @media (max-width: 768px) {
+    .employee-card {
+      width: 100%; /* One card per row */
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .manager-card {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+    
+    .employee-card {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+  }
+  

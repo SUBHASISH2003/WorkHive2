@@ -1,0 +1,101 @@
+/* Main container for the leave section */
+.EmpLeaveMainCon {
+    margin-top: 6rem;
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    box-sizing: border-box; /* Ensure padding is included in width/height calculation */
+}
+
+/* Button row container */
+.EmpButtonRow {
+    width: 100%;
+    padding: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-evenly;
+    gap: 1rem; /* Ensure some gap between buttons */
+    box-sizing: border-box; /* Ensure padding is accounted for */
+}
+
+/* Button link styling */
+.ButtonLinks {
+    text-decoration: none;
+    font-weight: 700;
+    color: white;
+}
+
+/* Styling for buttons in the button row */
+.EmpButtonRow button {
+    padding: 0.7rem;
+    border: 2px solid transparent;
+    background: #000;
+    width: auto; /* Let the button size adjust based on content */
+    min-width: 120px; /* Minimum width for buttons */
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+    text-align: center;
+}
+
+/* Hover effect for buttons */
+.EmpButtonRow button:hover {
+    background-color: #fff;
+    border: 2px solid black;
+}
+
+.EmpButtonRow button:hover .ButtonLinks {
+    color: black;
+}
+
+/* Styling for active leave button */
+.LeaveActive {
+    background-color: #14e4eb;
+}
+
+/* --- RESPONSIVE DESIGN --- */
+
+/* Tablet View (Portrait) */
+@media screen and (max-width: 768px) {
+    .EmpLeaveMainCon {
+        margin-top: 4rem; /* Adjust top margin for tablets */
+    }
+
+    .EmpButtonRow {
+        flex-direction: column; /* Stack buttons vertically on smaller screens */
+        gap: 1rem; /* Add spacing between buttons */
+        align-items: center; /* Center align buttons */
+    }
+
+    .EmpButtonRow button {
+        width: 80%; /* Increase button width for easier touch on smaller screens */
+        padding: 1rem; /* Larger padding for better touch interaction */
+    }
+
+    .ButtonLinks {
+        font-size: 16px; /* Slightly smaller font size for better fit */
+    }
+}
+
+/* Mobile View (Portrait) */
+@media screen and (max-width: 480px) {
+    .EmpLeaveMainCon {
+        margin-top: 3rem; /* Adjust top margin for mobile */
+    }
+
+    .EmpButtonRow {
+        flex-direction: column;
+        gap: 1rem; /* Maintain spacing between buttons */
+        align-items: center; /* Center align buttons */
+    }
+
+    .EmpButtonRow button {
+        width: 90%; /* Full width buttons on mobile */
+        padding: 1.2rem; /* Larger padding for easier touch interaction */
+    }
+
+    .ButtonLinks {
+        font-size: 14px; /* Further reduce font size for mobile */
+    }
+}

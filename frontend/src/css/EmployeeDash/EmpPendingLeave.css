@@ -1,0 +1,220 @@
+/* Container for the entire section */
+.emp-pending-container {
+    display: flex;
+    flex-wrap: wrap; /* Allow wrapping on smaller screens */
+    gap: 1rem;
+    padding: 20px;
+    height: 100vh;
+    justify-content: flex-start;
+    align-items: flex-start;
+}
+
+/* Container for the leave cards */
+.EmpPendingCardCon {
+    width: 100%; /* Full width on smaller screens */
+    max-width: 55%; /* Limit width to 55% for larger screens */
+    height: 100%; /* Let the height adjust */
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    overflow-y: auto; /* Enable scroll when content overflows */
+    scrollbar-width: thin;
+    scrollbar-color: #9B7EBD #D4BEE4;
+    flex: 1; /* Make the card containers flexible */
+}
+
+/* Custom scrollbar for Webkit browsers (Chrome, Safari, Edge) */
+.EmpPendingCardCon::-webkit-scrollbar {
+    width: 8px;
+}
+
+.EmpPendingCardCon::-webkit-scrollbar-thumb {
+    background-color: #9B7EBD;
+    border-radius: 10px;
+}
+
+.EmpPendingCardCon::-webkit-scrollbar-track {
+    background-color: #D4BEE4;
+}
+
+/* Title styling */
+.title {
+    font-size: 24px;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 20px;
+}
+
+/* Individual leave card styling */
+.leave-card {
+    background: white;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+    padding: 20px;
+    width: 100%;
+    border: 1px solid #ddd;
+    box-sizing: border-box;
+}
+
+/* Card content flexbox for structure */
+.card-content {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+/* Header within the card */
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* Leave type styling */
+.leave-type {
+    font-size: 18px;
+    font-weight: bold;
+    color: #2c3e50;
+}
+
+/* Status button for leave status */
+.status {
+    background: #e74c3c;
+    color: white;
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+/* Description text in the card */
+.description {
+    font-size: 14px;
+    color: #555;
+}
+
+/* Date container */
+.date-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 14px;
+    color: #333;
+}
+
+/* Date details inside the card */
+.date {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+/* Styling for "To" text */
+.to-text {
+    font-weight: bold;
+    color: #888;
+}
+
+/* Total days counter */
+.total-days {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 16px;
+    font-weight: bold;
+    color: #2980b9;
+}
+
+/* --- RESPONSIVE DESIGN --- */
+/* Small Tablet View */
+@media screen and (max-width: 850px) {
+    .emp-pending-container {
+        flex-direction: column; /* Stack items vertically on smaller screens */
+        padding: 10px; /* Reduced padding */
+    }
+
+    .EmpPendingCardCon {
+        max-width: 100%;
+        flex-direction: column; /* Stack cards vertically */
+        height: 80vh; /* Adjust height for smaller devices, 80% of the viewport height */
+    }
+
+    .title {
+        font-size: 20px; /* Smaller title */
+    }
+
+    .leave-card {
+        padding: 15px; /* Reduced padding */
+    }
+}
+
+/* Tablet View (Portrait) */
+@media screen and (max-width: 768px) {
+    .emp-pending-container {
+        flex-direction: column; 
+        align-items: center; 
+    }
+
+    .EmpPendingCardCon {
+        width: 100%; /* Full width on smaller screens */
+        max-height: none; /* Allow full scroll height */
+        height: 80vh; /* Adjust height for better visibility */
+        flex: 1; /* Make the cards flexible */
+    }
+
+    .title {
+        font-size: 18px; /* Smaller title */
+    }
+
+    .leave-card {
+        padding: 15px; /* Reduced padding */
+    }
+
+    .header {
+        flex-direction: column; /* Stack header content vertically */
+        align-items: flex-start; /* Align to left */
+    }
+
+    .date-container {
+        flex-direction: column; /* Stack date container vertically */
+    }
+}
+
+/* Mobile View (Portrait) */
+@media screen and (max-width: 480px) {
+    .emp-pending-container {
+        flex-direction: column;
+        padding: 10px; /* Reduced padding */
+    }
+
+    .EmpPendingCardCon {
+        width: 100%; /* Full width on mobile */
+        max-height: none; /* Allow full height */
+        height: 70vh; /* Set height to 70% of the viewport */
+        flex: 1; /* Make the cards flexible */
+    }
+
+    .title {
+        font-size: 16px; /* Smaller title */
+    }
+
+    .leave-card {
+        padding: 10px; /* Less padding */
+    }
+
+    .card-content {
+        gap: 8px; /* Reduce gap */
+    }
+
+    .header {
+        justify-content: flex-start; /* Align to the left */
+    }
+
+    .date-container {
+        font-size: 12px; /* Smaller font */
+    }
+
+    .total-days {
+        font-size: 14px; /* Smaller font */
+    }
+}

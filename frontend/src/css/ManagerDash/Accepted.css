@@ -1,0 +1,170 @@
+/* Main Container */
+.accepted-container {
+    width: 100%;
+    margin: 2rem auto;
+    padding: 1rem;
+    text-align: center;
+}
+
+.accepted-container h2 {
+    font-size: 24px;
+    color: #3B1E54;
+    margin-bottom: 1rem;
+}
+
+/* Table Design */
+.accepted-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #fff;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+/* Table Headers */
+.accepted-table th {
+    background-color: #4a065b;
+    color: white;
+    padding: 12px;
+    font-size: 16px;
+    text-align: left;
+}
+
+/* Table Data */
+.accepted-table td {
+    padding: 12px;
+    font-size: 14px;
+    color: #495057;
+    border-bottom: 1px solid #ddd;
+}
+
+/* Profile Picture */
+.profile-pic {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #3B1E54;
+}
+
+/* Status Styling */
+.MngAcceptedStatus {
+    font-weight: bold;
+    color: #28a745 !important;
+}
+
+/* Hover Effects */
+.accepted-table tr:hover {
+    background: #f8f9fa;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+    /* Tablet View */
+    .accepted-container {
+        width: 90%;
+        padding: 1rem;
+    }
+
+    .accepted-table th, .accepted-table td {
+        padding: 10px;
+        font-size: 14px;
+    }
+
+    .profile-pic {
+        width: 40px;
+        height: 40px;
+    }
+
+    .MngAcceptedStatus {
+        font-size: 14px;
+    }
+}
+
+@media (max-width: 768px) {
+    /* Small Screen Devices (Tablets and smaller) */
+    .accepted-container {
+        width: 100%;
+        padding: 0.75rem;
+    }
+
+    .accepted-table th, .accepted-table td {
+        padding: 8px;
+        font-size: 12px;
+    }
+
+    .profile-pic {
+        width: 35px;
+        height: 35px;
+    }
+
+    .MngAcceptedStatus {
+        font-size: 12px;
+    }
+
+    /* Hide table text in smaller screens and use a more compact view */
+    .accepted-table th:nth-child(3), .accepted-table td:nth-child(3),
+    .accepted-table th:nth-child(4), .accepted-table td:nth-child(4) {
+        display: none;
+    }
+
+    /* Show labels for each row item on small devices */
+    .accepted-table td::before {
+        content: attr(data-label);
+        font-weight: bold;
+        padding-right: 10px;
+        display: inline-block;
+        min-width: 90px;
+    }
+}
+
+@media (max-width: 480px) {
+    /* Extra Small Devices (Very Small Screens) */
+    .accepted-container {
+        padding: 0.25rem;
+    }
+
+    .accepted-container h2 {
+        font-size: 18px;
+    }
+
+    .accepted-table th, .accepted-table td {
+        padding: 6px;
+        font-size: 10px;
+    }
+
+    .profile-pic {
+        width: 30px;
+        height: 30px;
+    }
+
+    .MngAcceptedStatus {
+        font-size: 10px;
+    }
+
+    /* Adjust the layout for a cleaner view on very small screens */
+    .accepted-table th, .accepted-table td {
+        display: block;
+        text-align: left;
+    }
+
+    .accepted-table td {
+        border-bottom: 1px solid #ddd;
+        padding-left: 40px; /* To align text properly with the profile pic */
+    }
+
+    .accepted-table th {
+        display: none; /* Hide table headers for small screens */
+    }
+
+    /* Add the labels in front of each data item */
+    .accepted-table td::before {
+        content: attr(data-label);
+        font-weight: bold;
+        padding-right: 10px;
+        display: inline-block;
+        min-width: 90px;
+        color: #3B1E54;
+    }
+}

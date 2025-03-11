@@ -1,0 +1,82 @@
+.leave-request-container {
+    /* max-width: 450px; */
+    width: 40%;
+    /* margin: 50px auto; */
+    padding: 20px;
+    background: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
+  }
+  
+  .leave-request-container h2 {
+    color: #3B1E54;
+    margin-bottom: 20px;
+    font-size: 1.8rem;
+  }
+  
+  .leave-request-form {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .leave-form-group {
+    margin-bottom: 15px;
+    text-align: left;
+  }
+  
+  .leave-form-group label {
+    font-weight: bold;
+    display: block;
+    margin-bottom: 5px;
+    color: #495057;
+  }
+  
+  .leave-form-group select,
+  .leave-form-group input,
+  .leave-form-group textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 1rem;
+    transition: border 0.3s ease;
+  }
+  
+  .leave-form-group textarea {
+    resize: vertical;
+    height: 100px;
+  }
+  
+  .leave-form-group input:focus,
+  .leave-form-group select:focus,
+  .leave-form-group textarea:focus {
+    border-color: #9B7EBD;
+    outline: none;
+  }
+  
+  .leave-submit-btn {
+    background: #3B1E54;
+    color: #fff;
+    padding: 12px;
+    border: none;
+    border-radius: 6px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background 0.3s ease;
+  }
+  
+  .leave-submit-btn:hover {
+    background: #9B7EBD;
+  }
+  
+  .leave-form-group input[disabled] {
+    background: #EEEEEE;
+    color: #888;
+    cursor: not-allowed;
+  }
+  @media screen and (max-width:850px) {
+    .leave-request-container{
+      width: 100%;
+    }
+  }

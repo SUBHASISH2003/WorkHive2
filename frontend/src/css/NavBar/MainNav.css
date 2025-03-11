@@ -1,0 +1,130 @@
+@import url('https://fonts.googleapis.com/css2?family=Josefin+Sans:ital,wght@0,100..700;1,100..700&family=Luckiest+Guy&family=Oswald:wght@200..700&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Prompt:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Rammetto+One&family=Titan+One&display=swap');
+
+.MainNavDiv {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 90%;
+    position: fixed;
+    top: 3%;
+    left: 6%;
+    background-color: #A6E3E9; 
+    padding: 0.3rem;
+    z-index: 1111;
+    border-radius: 30px;
+    transition: all 0.3s ease-in-out; /* Smooth transitions for better UX */
+  }
+  
+  .menu-web {
+    list-style: none;
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+    gap: 2rem;
+  }
+  
+  .menu-web li {
+    color: #A6E3E9;
+    font-weight: 700;
+    font-size: 1rem;
+    cursor: pointer;
+    padding: 0.6rem;
+    border-radius: 30px;
+    transition: all 0.2s ease-in-out;
+
+  }
+  
+  .menu-web li:hover {
+    background-color: #E3FDFD;
+    border-radius: 30px;
+    color: black;
+  }
+  
+  .Ham_menu {
+    display: none; /* Initially hidden */
+    background-color: transparent;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+  }
+  .menu-mobile{
+    display: none;
+  }
+  .Logo{
+    padding: 0.5rem;
+    background-color: #fff;
+    border-radius: 30px;
+  }
+  .Logo h3{
+    font-family: "Rammetto One", serif;
+    letter-spacing: 1rem;
+  }
+
+  .NavLinks{
+    text-decoration: none;
+    /* color: #A6E3E9; */
+    color: black;
+  }
+
+  .LinkActive{
+    background-color: #E3FDFD;
+    border-radius: 30px;
+    color: black;
+  }
+
+  @media screen and (max-width: 1000px) {
+    .Ham_menu {
+      display: inline; /* Show hamburger menu */
+    }
+  
+    .menu-web {
+      display: none; /* Hide the desktop menu */
+    }
+  
+    .MainNavDiv {
+      border-radius: 0; 
+      width: 90%; 
+      left: 6%;
+      top: 3%; 
+    }
+  
+    .menu-mobile {
+    display: inline;
+      position: absolute;
+      top: 4rem;
+      left: 0;
+      width: 100%;
+      padding: 10px;
+      background-color: #fff;
+      box-shadow: 2px 10px 20px rgba(55, 55, 55, 0.216);
+      z-index: 1110; /* Ensure it's below the nav bar */
+    }
+  
+    .menu-mobile li {
+      width: 100%;
+      text-align: center;
+      margin-bottom: 1rem;
+      list-style: none;
+      font-size: 1.1rem;
+      color: #111;
+      font-weight: 600;
+    }
+  
+    .menu-mobile li:hover {
+      color: #71C9CE; 
+    }
+  }
+  
+  @media screen and (max-width: 600px) {
+    .MainNavDiv {
+      width: 100%;
+      left: 0;
+      top: 0;
+      border-radius: 0; 
+    }
+  
+    .menu-mobile {
+      font-size: 1rem; 
+    }
+  }
+  

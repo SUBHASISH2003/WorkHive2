@@ -27,6 +27,7 @@ const userSchema = new mongoose.Schema({
   },
   bio: {
     type: String,
+    default: "Add your bio",
   },
   profilePic: {
     type: String,
@@ -77,11 +78,46 @@ const userSchema = new mongoose.Schema({
 userSchema.add({
   noOfLinkedEmp: {
     type: Number,
-    default: 0,
+    
   },
   totalNoOfTaskCreated: {
     type: Number,
-    default: 0,
+    
+  },
+  
+});
+
+
+// Fields only for employees
+userSchema.add({
+  totalNoOfAssignTask: {
+    type: Number,
+    
+  },
+  totalCompletedTasks: {
+    type: Number,
+    
+  },
+  totalAcceptedTasks: {
+    type: Number,
+  },
+  totalRejectedTasks: {
+    type: Number,
+  },
+  totalPendingTasks: {
+    type: Number,
+  },
+  totalFailedTasks: {
+    type: Number,
+  },
+  performance: {
+    type: Number, // Store performance as percentage
+    
+  },
+  grade: {
+    type: String,
+    enum: ["Excellent", "Good", "Average", "Bad"],
+    
   },
 });
 
@@ -126,6 +162,36 @@ userSchema.pre("save", async function (next) {
   if (!this.age) {
     const error = new Error("Date of birth is required to calculate age.");
     return next(error);
+  }
+
+  if (this.role === "Manager") {
+    // Remove Employee-specific fields from Manager documents
+    this.totalNoOfAssignTask = undefined;
+    this.totalCompletedTasks = undefined;
+    this.totalAcceptedTasks = undefined;
+    this.totalRejectedTasks = undefined;
+    this.totalPendingTasks = undefined;
+    this.totalFailedTasks = undefined;
+    this.performance = undefined;
+    this.grade = undefined;
+
+    // Ensure Manager-specific fields exist
+    this.noOfLinkedEmp = this.noOfLinkedEmp || 0;
+    this.totalNoOfTaskCreated = this.totalNoOfTaskCreated || 0;
+  } else if (this.role === "Employee") {
+    // Remove Manager-specific fields from Employee documents
+    this.noOfLinkedEmp = undefined;
+    this.totalNoOfTaskCreated = undefined;
+
+    // Ensure Employee-specific fields exist
+    this.totalNoOfAssignTask = this.totalNoOfAssignTask || 0;
+    this.totalCompletedTasks = this.totalCompletedTasks || 0;
+    this.totalAcceptedTasks = this.totalAcceptedTasks || 0;
+    this.totalRejectedTasks = this.totalRejectedTasks || 0;
+    this.totalPendingTasks = this.totalPendingTasks || 0;
+    this.totalFailedTasks = this.totalFailedTasks || 0;
+    this.performance = this.performance || 0;
+    this.grade = this.grade || "Bad";
   }
 
   next();

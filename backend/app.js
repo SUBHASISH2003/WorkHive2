@@ -7,6 +7,7 @@ import { errorMiddleware } from "./middlewares/error.js";
 import userRouter from "./routes/user.router.js";
 import { removeUnverifiedAccounts } from "./automation/removeUnverifiedAccounts.js";
 import taskRouter from "./routes/task.router.js";
+import updateExpiredTasks from "./automation/taskScheduler.js";
 import contactRoutes from "./routes/contactUs.router.js";
 import { leaveRoutes } from "./routes/leaveRequest.router.js";
 
@@ -34,6 +35,7 @@ app.use("/api/contact", contactRoutes);
 app.use("/api/leave", leaveRoutes);
 
 removeUnverifiedAccounts();
+updateExpiredTasks();
 connection();
 
 app.use(errorMiddleware);
