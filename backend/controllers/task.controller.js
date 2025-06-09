@@ -310,7 +310,7 @@ export const getTasksByStatus = async (req, res) => {
 
     // Validate status input
     const validStatuses = ["pending", "failed", "completed"];
-    if (!validStatuses.includes(status)) {
+    if (!validStatuses.includes(status.toLowerCase())) {
       return res.status(400).json({ message: "Invalid status parameter." });
     }
 
@@ -322,7 +322,7 @@ export const getTasksByStatus = async (req, res) => {
     // Fetch tasks where the employee is assigned and has the specified response status
     const tasks = await Task.find({
       "employeeResponses": {
-        $elemMatch: { employee: new mongoose.Types.ObjectId(_id), status: status }
+        $elemMatch: { employee: new mongoose.Types.ObjectId(_id), status: status.toLowerCase() }
       }
     }).select("title description deadline totalNoOfAssignEmp");
 

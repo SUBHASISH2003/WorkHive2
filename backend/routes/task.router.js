@@ -19,7 +19,7 @@ router.patch('/status/:taskId', isAuthenticated, markTaskAsComplete);
 router.get("/:taskId", isAuthenticated, getTaskDetails);
 
 // Get tasks by status (pending, failed, completed)
-router.get("/:status", isAuthenticated, getTasksByStatus);
+router.get("/status/:status", isAuthenticated, getTasksByStatus);
 
 
 
